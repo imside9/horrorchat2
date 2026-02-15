@@ -268,7 +268,7 @@
             align-items: center;
             gap: 6px;
         }
-        .evidence-title::before { content: '???; font-size: 0.9rem; }
+        .evidence-title::before { content: '📎'; font-size: 0.9rem; }
         .evidence-real-img {
             width: 100%;
             height: auto;
@@ -528,17 +528,17 @@
         <div class="ending-label">ENDING</div>
         <div class="ending-title" id="ending-title"></div>
         <div class="ending-desc" id="ending-desc"></div>
-        <button class="ending-restart" onclick="location.reload()">??????살퓢?????꿔꺂???影?우Ŀ?/button>
+        <button class="ending-restart" onclick="location.reload()">다시 플레이</button>
     </div>
 
     <header>
-        <span class="header-back">??/span>
+        <span class="header-back">←</span>
         <div class="header-info">
-            <div class="room-title" id="room-title">????嶺?筌??(?關???꾨き?筌욌끀??鍮㎳??????雅?퍔瑗?땟???</div>
-            <div class="user-count" id="header-count">4??/div>
+            <div class="room-title" id="room-title">Room 404 Coordination</div>
+            <div class="user-count" id="header-count">4 participants</div>
         </div>
         <div class="header-icons">
-            <span>??/span>
+            <span>⋯</span>
         </div>
     </header>
 
@@ -546,7 +546,7 @@
         <!-- Typing indicator -->
         <div class="typing-row" id="typing-row">
             <div class="avatar avatar-minsu" id="typing-avatar">
-                <img src="./images/profile_minsu.png" onerror="this.style.display='none'; this.parentElement.innerText='??;">
+                <img src="./images/profile_minsu.png" onerror="this.style.display='none'; this.parentElement.innerText='ME';">
             </div>
             <div class="typing-bubble">
                 <div class="dot"></div><div class="dot"></div><div class="dot"></div>
@@ -559,7 +559,7 @@
 
 <script>
 // ============================================================
-// ??????鶯ㅺ동???怨몄쓥???? ????????轅붽틓???????
+// Chat-based horror game script
 // ============================================================
 
 // === CONFIG ===
@@ -926,7 +926,7 @@ async function addMessage(data) {
         content.className = 'msg-content';
         content.innerHTML = `
             <span class="sender-name">${data.speaker}</span>
-            <div class="msg-bubble bubble-left msg-deleted">[???饔낅떽????????????????????????</div>
+            <div class="msg-bubble bubble-left msg-deleted">[이 메시지는 삭제되었습니다]</div>
         `;
         if (avatar) row.appendChild(avatar);
         row.appendChild(content);
@@ -957,9 +957,9 @@ async function addMessage(data) {
         let mediaHtml = '';
         if (data.image) {
             mediaHtml = `
-                <img src="${data.image}" class="evidence-real-img" alt="?饔낅떽??影?곗몡???紐?怨뚮옩鴉딅퀫??
+                <img src="${data.image}" class="evidence-real-img" alt="evidence image"
                      onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                <div class="img-error">(?????饔낅떽???? ??????⑤뜤?? ${data.image})</div>`;
+                <div class="img-error">(이미지를 불러올 수 없습니다: ${data.image})</div>`;
         } else if (data.audioMode) {
             const bars = Array.from({length: 20}, (_, i) =>
                 `<div class="bar" style="animation-duration:${0.3 + Math.random() * 0.6}s; animation-delay:${i * 0.05}s"></div>`
@@ -1046,7 +1046,7 @@ async function addMessage(data) {
     await wait(READING_DELAY);
 }
 
-// === GHOST READ (??????⑤뜪??????????????????癲? ===
+// === GHOST READ (phantom read receipt) ===
 async function showGhostRead(name) {
     const allRows = chatWindow.querySelectorAll('.msg-row-left');
     const lastRow = allRows[allRows.length - 1];
