@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>404호: 수정 전쟁</title>
+    <title>404?? ?섏젙 ?꾩웳</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
 
@@ -268,7 +268,7 @@
             align-items: center;
             gap: 6px;
         }
-        .evidence-title::before { content: '📎'; font-size: 0.9rem; }
+        .evidence-title::before { content: '?뱨'; font-size: 0.9rem; }
         .evidence-real-img {
             width: 100%;
             height: auto;
@@ -525,20 +525,20 @@
 
     <!-- ENDING OVERLAY -->
     <div id="ending-overlay">
-        <div class="ending-label">엔딩</div>
+        <div class="ending-label">?붾뵫</div>
         <div class="ending-title" id="ending-title"></div>
         <div class="ending-desc" id="ending-desc"></div>
-        <button class="ending-restart" onclick="location.reload()">다시 플레이</button>
+        <button class="ending-restart" onclick="location.reload()">?ㅼ떆 ?뚮젅??/button>
     </div>
 
     <header>
-        <span class="header-back">←</span>
+        <span class="header-back">??/span>
         <div class="header-info">
-            <div class="room-title" id="room-title">404호 조정 채팅방</div>
-            <div class="user-count" id="header-count">참여자 4명</div>
+            <div class="room-title" id="room-title">404??議곗젙 梨꾪똿諛?/div>
+            <div class="user-count" id="header-count">李몄뿬??4紐?/div>
         </div>
         <div class="header-icons">
-            <span>⋯</span>
+            <span>??/span>
         </div>
     </header>
 
@@ -558,268 +558,364 @@
 </div>
 
 <script>
-// ============================================================
-// Chat-based horror game script
-// ============================================================
+// 404호: 답하지 않은 밤 v3 game script
+let TYPING_DELAY = 1200;
+const READING_DELAY = 800;
+let currentTime = { h: 2, m: 9 };
+let currentSceneId = "prologue_alarm";
+let gameEnded = false;
+let timerStarted = false;
+let retentionSeconds = 20 * 60;
 
-// === CONFIG ===
-let TYPING_DELAY = 1800;
-const READING_DELAY = 1000;
-const FAST_TYPING = 800;
-let loopCount = 0;
-let currentTime = { h: 23, m: 47 };
-
-// === CHARACTER DATA ===
-const CHARACTERS = {
-    '서윤': {
-        avatarClass: 'avatar-jisu',
-        avatarImg: './images/profile_jisu.png',
-        avatarFallback: 'SY',
-        color: '#aa66cc'
-    },
-    '태민': {
-        avatarClass: 'avatar-younghun',
-        avatarImg: './images/profile_younghun.png',
-        avatarFallback: 'TM',
-        color: '#5588cc'
-    },
-    '하나': {
-        avatarClass: 'avatar-jisu',
-        avatarImg: './images/profile_jisu.png',
-        avatarFallback: 'HN',
-        color: '#c48f5a'
-    },
-    '알 수 없는 사용자': {
-        avatarClass: 'avatar-unknown',
-        avatarImg: './images/profile_unknown.png',
-        avatarFallback: '?',
-        color: '#888'
+const gameState = {
+    c1: null,
+    e1: null,
+    accuseAttempts: 0,
+    empathyRoute: false,
+    conspiracyRoute: false,
+    clues: [],
+    suspicion: {
+        seoyun: 1,
+        taemin: 1,
+        hana: 1,
+        me: 1
     }
 };
 
-// === SCENARIO ===
+const CHARACTERS = {
+    "서윤": {
+        avatarClass: "avatar-jisu",
+        avatarImg: "./images/profile_jisu.png",
+        avatarFallback: "SY",
+        color: "#aa66cc"
+    },
+    "태민": {
+        avatarClass: "avatar-younghun",
+        avatarImg: "./images/profile_younghun.png",
+        avatarFallback: "TM",
+        color: "#5588cc"
+    },
+    "하나": {
+        avatarClass: "avatar-jisu",
+        avatarImg: "./images/profile_jisu.png",
+        avatarFallback: "HN",
+        color: "#c48f5a"
+    },
+    "지후": {
+        avatarClass: "avatar-unknown",
+        avatarImg: "./images/profile_unknown.png",
+        avatarFallback: "JH",
+        color: "#777"
+    }
+};
+
 const scenario = {
-    "prologue_retention_notice": {
+    prologue_alarm: {
         type: "notification",
         notifications: [
-            { delay: 1000, sender: "시스템", text: "채팅방 로그 보존 시간이 20분 후 만료됩니다." },
-            { delay: 1800, sender: "하나", text: "이번엔 지금 바로 끝내자. 영상 말고 로그로만 간다." },
-            { delay: 2400, sender: "메신저", text: "'404호 조정 채팅방'에 초대되었습니다.", isInvite: true }
+            { delay: 900, sender: "시스템", text: "404호 단체 채팅방이 복원되었습니다." },
+            { delay: 1500, sender: "시스템", text: "삭제 로그 23개가 감지되었습니다." },
+            { delay: 1900, sender: "시스템", text: "보존 만료까지 20분", isInvite: true }
         ],
-        next: "start_invite"
+        next: "scene_a_entry"
     },
-    "start_invite": {
+    scene_a_entry: {
         type: "system",
-        text: "[시스템] 임시 조사 채팅방이 생성되었습니다. 참여자 동기화 완료.",
-        next: "date_divider"
+        text: "[시스템] 복구 작업이 시작되었습니다.",
+        next: "scene_a_date"
     },
-    "date_divider": {
+    scene_a_date: {
         type: "date",
-        text: "2026년 2월 15일 일요일",
-        next: "act1_accuse_open"
+        text: "2026년 2월 15일 일요일 · 현재 02:10",
+        next: "scene_b_log"
     },
-    "act1_accuse_open": {
+    scene_b_log: {
+        type: "evidence",
         speaker: "서윤",
-        text: "돌려 말하지 말자. 마지막 현장 인원은 태민이야. 거기부터 시작해.",
-        next: "act1_choice"
+        title: "3일 전 로그 01:10~01:15",
+        text: "01:10 지후: 너 지금 어디야\n01:11 지후: 약 잘못 먹은 것 같아\n01:12 지후: 숨이 이상해\n01:15 지후: 전화 좀 받아줘\n(읽음 4)",
+        next: "scene_b_react_1"
     },
-    "act1_choice": {
+    scene_b_react_1: { speaker: "서윤", text: "우리 다 읽었네.", next: "scene_b_react_2" },
+    scene_b_react_2: { speaker: "태민", text: "저때도 또 시작인가 싶었지.", next: "scene_b_react_3" },
+    scene_b_react_3: { speaker: "하나", text: "전화 한 통은 했어야지.", next: "scene_c_private_intro" },
+
+    scene_c_private_intro: {
+        type: "system",
+        text: "[시스템] 삭제된 개인 메시지 1건이 복원되었습니다.",
+        next: "scene_c_private_evidence"
+    },
+    scene_c_private_evidence: {
+        type: "evidence",
+        speaker: "지후",
+        title: "지후 -> 나 개인톡",
+        text: "01:11 지후: 너만이라도 좀\n01:13 나: [삭제됨]",
+        next: "scene_c_chat_1"
+    },
+    scene_c_chat_1: { speaker: "서윤", text: "잠깐. 개인톡이 왜 여기 떠?", next: "scene_c_chat_2" },
+    scene_c_chat_2: { speaker: "태민", text: "너한테 먼저 보냈네?", next: "scene_c_choice" },
+    scene_c_choice: {
         type: "choice",
-        narration: "지금 바로 추궁할까, 아니면 로그부터 확인할까?",
+        narration: "뭐라고 답할까?",
         options: [
-            { label: "태민, 네 타임라인부터 설명해.", next: "act1_press_taemin" },
-            { label: "성급한 단정은 말고, 도어락 로그부터 보자.", next: "act1_hold_room" }
+            { label: "기억이 잘 안 나.", next: "scene_c1_memory" },
+            { label: "겁나서 못 했어.", next: "scene_c1_fear" },
+            { label: "지금 나 몰아가려고 복구한 거 아냐?", next: "scene_c1_frame" }
         ]
     },
-    "act1_press_taemin": {
+    scene_c1_memory: {
+        type: "state_update",
+        update: {
+            flags: { c1: "memory" },
+            suspicion: { me: 2, taemin: 1 },
+            clue: "개인톡 삭제 당사자가 나라는 사실이 확정됨"
+        },
+        message: { type: "system", text: "[기록] 진술 신뢰도 하락", subtype: "error" },
+        next: "scene_d_gap"
+    },
+    scene_c1_fear: {
+        type: "state_update",
+        update: {
+            flags: { c1: "fear", empathyRoute: true },
+            suspicion: { me: 1, taemin: 1 },
+            clue: "회피가 두려움에서 왔다는 진술 확보"
+        },
+        message: { speaker: "하나", text: "무서웠다는 건 알겠어. 근데 답은 안 했잖아." },
+        next: "scene_d_gap"
+    },
+    scene_c1_frame: {
+        type: "state_update",
+        update: {
+            flags: { c1: "frame", conspiracyRoute: true },
+            suspicion: { taemin: 2, hana: 1 },
+            clue: "복구가 의도적 표적화라는 가설 생성"
+        },
+        message: { speaker: "태민", text: "그 말은 누가 널 일부러 흔들었다는 거네." },
+        next: "scene_d_gap"
+    },
+
+    scene_d_gap: {
         type: "system",
-        text: "[시스템] 채팅방 긴장도 상승. 신뢰도 -1.",
+        text: "[시스템] 01:19~01:25 구간이 수동 삭제된 것으로 확인됩니다.",
+        next: "scene_d_react_1"
+    },
+    scene_d_react_1: { speaker: "서윤", text: "자동 삭제가 아니라 누가 지운 거네.", next: "scene_d_react_2" },
+    scene_d_react_2: { speaker: "태민", text: "근데 그걸 왜 지금 복구해?", next: "scene_d_react_3" },
+    scene_d_react_3: { speaker: "하나", text: "복구한 사람이 범인일 수도 있고, 증인일 수도 있지.", next: "scene_d_puzzle_intro" },
+    scene_d_puzzle_intro: {
+        type: "system",
+        text: "[퍼즐] 삭제 문장의 핵심 키워드를 복원하세요.",
+        next: "puzzle_d1_try1"
+    },
+    puzzle_d1_try1: {
+        type: "input",
+        placeholder: "정답 키워드 입력 (예: 나도힘들어)",
+        acceptAnswers: ["나도힘들어", "나도 힘들어"],
+        next: "scene_d_puzzle_ok",
+        failNext: "puzzle_d1_hint1"
+    },
+    puzzle_d1_hint1: {
+        type: "system",
+        text: "[힌트1] 지후의 마지막 반응은 '...알겠어'였다.",
+        next: "puzzle_d1_try2"
+    },
+    puzzle_d1_try2: {
+        type: "input",
+        placeholder: "정답 키워드 입력 (힌트: 6글자)",
+        acceptAnswers: ["나도힘들어", "나도 힘들어"],
+        next: "scene_d_puzzle_ok",
+        failNext: "puzzle_d1_hint2"
+    },
+    puzzle_d1_hint2: {
+        type: "system",
+        text: "[힌트2] 답장은 위로가 아니라 회피였다.",
         subtype: "error",
-        next: "act1_evidence_locklog"
+        next: "puzzle_d1_try3"
     },
-    "act1_hold_room": {
-        speaker: "서윤",
-        text: "좋아. 감정 빼고 기록으로만 확인하자.",
-        next: "act1_evidence_locklog"
+    puzzle_d1_try3: {
+        type: "input",
+        placeholder: "정답 키워드 최종 입력",
+        acceptAnswers: ["나도힘들어", "나도 힘들어"],
+        next: "scene_d_puzzle_ok",
+        failNext: "ending_bad"
     },
-    "act1_evidence_locklog": {
+    scene_d_puzzle_ok: {
         type: "evidence",
         speaker: "서윤",
-        title: "도어락_로그_404.txt",
-        text: "02:31:11 -> 잠금해제\n02:31:15 -> 문열림\n02:38:02 -> 문열림\n[02:31:16~02:38:01 구간 누락]",
-        next: "act2_evidence_elevatorlog"
+        title: "복원 완료 01:13~01:14",
+        text: "01:13 나: 나도 힘들어\n01:13 나: 오늘은 그냥 자\n01:14 지후: ...알겠어",
+        next: "scene_d_after_puzzle"
     },
-    "act2_evidence_elevatorlog": {
-        type: "evidence",
-        speaker: "태민",
-        title: "엘리베이터_호출순서.csv",
-        text: "02:33 B1 -> 4F\n02:34 4F -> 1F\n02:34 1F -> 4F\n물리적으로 성립하기 어려운 호출 순서야.",
-        next: "act2_choice"
+    scene_d_after_puzzle: {
+        type: "state_update",
+        update: { suspicion: { me: 1 }, clue: "삭제 문장: 나도 힘들어" },
+        message: { speaker: "하나", text: "지후는 그 말 보고 끊은 거네." },
+        next: "scene_e_choice"
     },
-    "act2_choice": {
+
+    scene_e_choice: {
         type: "choice",
-        narration: "다음 대응을 선택하세요.",
+        narration: "지후의 현재 상태를 어떻게 볼까?",
         options: [
-            { label: "지금 태민 강제퇴장 투표를 밀어붙인다.", next: "act2_force_kickvote" },
-            { label: "편집 메타데이터 체인을 먼저 추적한다.", next: "act2_trace_metadata" }
+            { label: "의식불명", next: "scene_e_coma" },
+            { label: "실종", next: "scene_e_missing" },
+            { label: "사망", next: "scene_e_dead" }
         ]
     },
-    "act2_force_kickvote": {
-        type: "system",
-        text: "[권한 오류] 강제퇴장 투표가 거부되었습니다. 역할 서명이 일치하지 않습니다.",
-        subtype: "error",
-        effect: "shake",
-        next: "act2_evidence_powerlog"
+    scene_e_coma: {
+        type: "state_update",
+        update: {
+            flags: { e1: "coma" },
+            suspicion: { seoyun: 1 },
+            clue: "상태 추정: 의식불명"
+        },
+        message: { speaker: "서윤", text: "아직 늦지 않았다는 쪽으로 믿고 싶어." },
+        next: "scene_f_order"
     },
-    "act2_trace_metadata": {
-        speaker: "하나",
-        text: "오프라인으로 찍힌 계정이 동시에 글을 올렸어. 단순 지연이 아니야.",
-        next: "act2_evidence_powerlog"
+    scene_e_missing: {
+        type: "state_update",
+        update: {
+            flags: { e1: "missing" },
+            suspicion: { hana: 1 },
+            clue: "상태 추정: 실종"
+        },
+        message: { speaker: "하나", text: "없어졌다는 건 누군가가 덮었다는 뜻일 수도 있어." },
+        next: "scene_f_order"
     },
-    "act2_evidence_powerlog": {
+    scene_e_dead: {
+        type: "state_update",
+        update: {
+            flags: { e1: "dead" },
+            suspicion: { taemin: 1 },
+            clue: "상태 추정: 사망"
+        },
+        message: { speaker: "태민", text: "장례식 때도 우린 아무 말 못 했잖아." },
+        next: "scene_f_order"
+    },
+
+    scene_f_order: {
+        type: "evidence",
+        speaker: "서윤",
+        title: "복구 순서 로그",
+        text: "1) 지후 -> 나 개인톡\n2) 01:19~01:25 공백\n3) 통화 흔적(부재중 7회)",
+        next: "scene_f_react"
+    },
+    scene_f_react: {
+        type: "state_update",
+        update: { clue: "복구는 무작위가 아니라 의도 순서였다" },
+        message: { speaker: "태민", text: "처음부터 네 톡부터 깐 거면, 누가 널 겨냥한 거야." },
+        next: "scene_g_memo"
+    },
+    scene_g_memo: {
         type: "evidence",
         speaker: "하나",
-        title: "복도_전력사용량.json",
-        text: "전력 스파이크: 02:34:20~02:34:53\n같은 구간에 오프라인 태그 메시지 3개가 겹친다.",
-        next: "act2_silence_gap"
+        title: "복구 메모",
+        text: "\"답하지 않은 사람은 결국 같은 편이 된다\"",
+        next: "scene_g_talk_1"
     },
-    "act2_silence_gap": {
+    scene_g_talk_1: { speaker: "하나", text: "이 문장, 지후가 자주 하긴 했어.", next: "scene_g_talk_2" },
+    scene_g_talk_2: { speaker: "하나", text: "근데 지후 폰 메모 맞춤법이랑 달라.", next: "scene_g_update" },
+    scene_g_update: {
+        type: "state_update",
+        update: {
+            suspicion: { taemin: 1, hana: 1 },
+            clue: "지후 문장 모방 가능성"
+        },
+        message: { type: "system", text: "[정리] 지후 직접 복구 가능성 하락", subtype: "glitch" },
+        next: "scene_h_summary"
+    },
+    scene_h_summary: {
         type: "system",
-        text: "[9초 동안 새 메시지가 없습니다.]",
-        subtype: "glitch",
-        next: "act3_intro"
+        text: "[핵심 단서] 1) 읽음 4 2) 공백 6분 수동 삭제 3) 개인톡 우선 복구",
+        next: "scene_h_choice"
     },
-    "act3_intro": {
-        type: "system",
-        text: "보존 타이머 작동 중. 복원 절차를 시작합니다. 질문 3개.",
-        next: "puzzle_1_revision_order"
-    },
-    "puzzle_1_revision_order": {
-        type: "input",
-        placeholder: "초안 스냅샷 순서 입력 (예: BAC)",
-        correctAnswer: "BAC",
-        next: "puzzle_1_ok",
-        failNext: "bad_fast_fail"
-    },
-    "puzzle_1_ok": {
-        type: "system",
-        text: "복원 1단계 완료. 초안 체인이 정렬되었습니다.",
-        next: "puzzle_2_impossible_timestamp"
-    },
-    "puzzle_2_impossible_timestamp": {
-        type: "input",
-        placeholder: "통합 타임라인의 불가능한 시각 (HHMMSS)",
-        correctAnswer: "231742",
-        next: "puzzle_2_ok",
-        failNext: "bad_fast_fail"
-    },
-    "puzzle_2_ok": {
-        type: "system",
-        text: "복원 2단계 완료. 작성자 범위가 좁혀졌습니다.",
-        next: "puzzle_3_backfill_author"
-    },
-    "puzzle_3_backfill_author": {
-        type: "input",
-        placeholder: "삭제 라인을 되살린 주체는? (나)",
-        correctAnswer: "나",
-        next: "puzzle_3_ok",
-        failNext: "bad_fast_fail"
-    },
-    "puzzle_3_ok": {
-        type: "system",
-        text: "복원 3단계 완료. 숨겨진 diff가 열렸습니다.",
-        next: "act4_evidence_deleted_draft_diff"
-    },
-    "act4_evidence_deleted_draft_diff": {
-        type: "evidence",
-        speaker: "하나",
-        title: "신고초안_변경내역.diff",
-        text: "- \"나는 거기 없었다\"\n+ \"난 난간을 잡았고, 결국 놓쳤다\"\n작성자 서명: 나 (지연 편집 큐)",
-        next: "act4_account_conflict"
-    },
-    "act4_account_conflict": {
-        type: "system",
-        text: "[충돌] 같은 계정이 같은 분 단위에서 상호 배타적 상태로 발화했습니다.",
-        count: "참여자 3명",
-        next: "final_choice"
-    },
-    "final_choice": {
+    scene_h_choice: {
         type: "choice",
-        narration: "최종 입장을 선택하세요.",
+        narration: "누가 먼저 움직였다고 보나?",
         options: [
-            { label: "인정할게. 타임라인을 고쳤고 구조에 실패했어.", next: "ending_true" },
-            { label: "전체 로그를 첨부해 다시 신고하겠다.", next: "ending_guilt" },
-            { label: "이 로그들 다 조작이야. 아무것도 믿을 수 없어.", next: "ending_madness" },
-            { label: "지금은 못 하겠다. 방을 초기화해.", next: "ending_loop" }
+            { label: "서윤", next: "judge_seoyun" },
+            { label: "태민", next: "judge_taemin" },
+            { label: "하나", next: "judge_hana" },
+            { label: "나", next: "judge_me" }
         ]
     },
-    "ending_true": {
+    scene_h_retry: {
+        type: "choice",
+        narration: "오답이다. 1회 재지목 기회가 남아 있다.",
+        options: [
+            { label: "서윤", next: "judge_seoyun" },
+            { label: "태민", next: "judge_taemin" },
+            { label: "하나", next: "judge_hana" },
+            { label: "나", next: "judge_me" }
+        ]
+    },
+    judge_seoyun: { type: "accuse_result", target: "seoyun", successNext: "ending_confess", retryNext: "scene_h_retry", failNext: "ending_collusion" },
+    judge_taemin: { type: "accuse_result", target: "taemin", successNext: "ending_confess", retryNext: "scene_h_retry", failNext: "ending_collusion" },
+    judge_hana: { type: "accuse_result", target: "hana", successNext: "ending_confess", retryNext: "scene_h_retry", failNext: "ending_collusion" },
+    judge_me: { type: "accuse_result", target: "me", successNext: "ending_self", retryNext: "scene_h_retry", failNext: "ending_collusion" },
+
+    ending_confess: {
         type: "ending_sequence",
         sequence: [
-            { speaker: "태민", text: "오늘 처음으로 진실한 문장이 나왔네.", delay: 1200 },
-            { type: "system", text: "[기록] 사건 태그 갱신: 구조 실패 / 자기 편집 인정." },
-            { speaker: "서윤", text: "이제 사실로 끝내자.", delay: 1000 }
+            { type: "system", text: "[시스템] 복구 작업자 특정 완료." },
+            { speaker: "태민", text: "그날을 묻으면 우리 다 괜찮은 척하게 되니까.", delay: 1200 },
+            { speaker: "서윤", text: "난 알림 보고도 침대에서 못 일어났어.", delay: 1000 },
+            { speaker: "하나", text: "난 누가 먼저 답하겠지 하고 기다렸고.", delay: 1000 },
+            { speaker: "태민", text: "난 책임질까 봐 대답을 미뤘어.", delay: 1000 },
+            { speaker: "ME", text: "난 '나도 힘들다'고 말하고 끝냈어.", delay: 1000 },
+            { type: "system", text: "[시스템] 복구 완료. 삭제 로그 보존." }
         ],
         ending: {
-            label: "진실 엔딩",
-            title: "수용",
-            desc: "당신은 책임을 인정하고 타임라인을 복원했다.\n채팅방에 처음으로 정적이 찾아온다."
+            label: "고백 엔딩",
+            title: "같은 편",
+            desc: "침묵의 책임이 네 사람 모두에게 있었다는 사실이 남았다."
         }
     },
-    "ending_guilt": {
+    ending_collusion: {
         type: "ending_sequence",
         sequence: [
-            { type: "system", text: "[재신고] diff 첨부 진술서가 접수되었습니다." },
-            { type: "system", text: "[배정] 담당 조사관이 지정되었습니다." },
-            { speaker: "하나", text: "늦어도 진실은 진실이야.", delay: 900 }
+            { type: "system", text: "[시스템] 지목 불일치. 재구성 실패.", subtype: "error" },
+            { speaker: "서윤", text: "또 서로 탓만 하네.", delay: 1200 },
+            { speaker: "하나", text: "시간 끝나간다.", delay: 1000 },
+            { type: "system", text: "[시스템] 보존 만료. 복구되지 않은 로그가 삭제되었습니다.", subtype: "error" },
+            { type: "system", text: "남은 건 읽음 4" }
         ],
         ending: {
-            label: "책임 엔딩",
-            title: "자수",
-            desc: "당신은 법적 책임을 선택했다.\n기록은 아프지만, 이제 완전해졌다."
+            label: "공모 엔딩",
+            title: "침묵 유지",
+            desc: "진실은 사라지고, 네 사람의 침묵만 같은 편으로 남았다."
         }
     },
-    "ending_madness": {
+    ending_self: {
         type: "ending_sequence",
         sequence: [
-            { type: "system", text: "[신뢰] 채팅방 신뢰도가 0%로 붕괴했습니다." },
-            { type: "spam", texts: ["편집됨", "편집됨", "편집됨", "누가 쓴 거지"], delay: 170 },
-            { speaker: "서윤", text: "모든 로그가 가짜라면, 너도 가짜겠지.", delay: 1200 }
+            { type: "system", text: "[시스템] 복구 작업자: ME" },
+            { speaker: "서윤", text: "뭐?", delay: 900 },
+            { speaker: "하나", text: "너가...?", delay: 900 },
+            { speaker: "태민", text: "왜 이제 와서?", delay: 900 },
+            { speaker: "ME", text: "그날을 그냥 지나가게 두면 아무 일도 아니게 될 것 같아서.", delay: 1200 },
+            { type: "system", text: "[기록] 진실보다 먼저 무너진 건 변명이었다." }
         ],
         ending: {
-            label: "부정 엔딩",
-            title: "부정",
-            desc: "당신은 모순을 거부했다.\n채팅방은 재귀와 잡음으로 붕괴한다."
+            label: "자기지목 엔딩",
+            title: "다시 연 밤",
+            desc: "너는 복구 버튼을 눌렀고, 묻어둔 시간은 다시 열렸다."
         }
     },
-    "ending_loop": {
+    ending_bad: {
         type: "ending_sequence",
         sequence: [
-            { type: "system", text: "[보존 타이머] 초기화 요청이 접수되었습니다." },
-            { type: "system", text: "[오류] 이전 복원 상태를 불러올 수 없습니다.", subtype: "error" },
-            { type: "system", text: "[시스템] 부분 캐시로 채팅방을 재생성합니다.", subtype: "error", delay: 1200 }
+            { type: "system", text: "[보존 만료] 복구 실패. 남은 데이터가 파기됩니다.", subtype: "error" },
+            { type: "system", text: "남은 건 읽음 4", subtype: "error" }
         ],
         ending: {
-            label: "루프 엔딩",
-            title: "유예",
-            desc: "당신은 진실을 미뤘다.\n채팅방은 이전보다 적은 기억으로 재시작된다."
-        }
-    },
-    "bad_fast_fail": {
-        type: "ending_sequence",
-        sequence: [
-            { type: "system", text: "[보존 만료] 복원되지 않은 로그가 영구 삭제되었습니다.", subtype: "error" },
-            { speaker: "하나", text: "이제 거의 노이즈뿐이야. 연결 고리를 잃었어.", delay: 1000 }
-        ],
-        ending: {
-            label: "배드 엔딩",
-            title: "소거",
-            desc: "핵심 시퀀스를 복원하기 전에 보존 시간이 끝났다.\n의심만 남고 진실은 사라진다."
+            label: "배드엔딩",
+            title: "삭제됨",
+            desc: "핵심 문장을 끝내 복원하지 못했고, 진실은 보존시간과 함께 사라졌다."
         }
     }
 };
 
-// === DOM ===
 const chatWindow = document.getElementById('chat-window');
 const interactionArea = document.getElementById('interaction-area');
 const headerCount = document.getElementById('header-count');
@@ -830,12 +926,14 @@ const endingOverlay = document.getElementById('ending-overlay');
 const roomTitle = document.getElementById('room-title');
 const gameFrame = document.getElementById('game-frame');
 
-// === UTILITIES ===
 function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 function getTime() {
-    currentTime.m++;
-    if (currentTime.m >= 60) { currentTime.m = 0; currentTime.h++; }
+    currentTime.m += 1;
+    if (currentTime.m >= 60) {
+        currentTime.m = 0;
+        currentTime.h += 1;
+    }
     if (currentTime.h >= 24) currentTime.h = 0;
     const h = currentTime.h;
     const period = h < 12 ? '오전' : '오후';
@@ -847,7 +945,6 @@ function scrollToBottom() {
     chatWindow.scrollTop = chatWindow.scrollHeight;
 }
 
-// === TYPING INDICATOR ===
 async function showTyping(speaker, duration) {
     const char = CHARACTERS[speaker];
     if (char) {
@@ -860,7 +957,6 @@ async function showTyping(speaker, duration) {
     typingRow.classList.remove('visible');
 }
 
-// === CREATE AVATAR ===
 function createAvatar(speaker) {
     const char = CHARACTERS[speaker];
     if (!char) return null;
@@ -870,15 +966,12 @@ function createAvatar(speaker) {
     return avatar;
 }
 
-// === LAST SPEAKER TRACKING (for grouping) ===
 let lastSpeaker = null;
 let lastSide = null;
 
-// === ADD MESSAGE ===
 async function addMessage(data) {
     const time = getTime();
 
-    // --- SYSTEM ---
     if (data.type === 'system' || data.type === 'date') {
         lastSpeaker = null;
 
@@ -902,21 +995,11 @@ async function addMessage(data) {
             gameFrame.classList.add('shake');
             setTimeout(() => gameFrame.classList.remove('shake'), 500);
         }
-        if (data.effect === 'flash') {
-            gameFrame.classList.add('flash');
-            setTimeout(() => gameFrame.classList.remove('flash'), 500);
-        }
-        if (data.count) {
-            headerCount.innerText = data.count;
-            headerCount.classList.add('alert');
-            setTimeout(() => headerCount.classList.remove('alert'), 3000);
-        }
 
         await wait(READING_DELAY);
         return;
     }
 
-    // --- DELETED MESSAGE ---
     if (data.type === 'deleted') {
         lastSpeaker = null;
         const row = document.createElement('div');
@@ -926,7 +1009,7 @@ async function addMessage(data) {
         content.className = 'msg-content';
         content.innerHTML = `
             <span class="sender-name">${data.speaker}</span>
-            <div class="msg-bubble bubble-left msg-deleted">[이 메시지는 삭제되었습니다]</div>
+            <div class="msg-bubble bubble-left msg-deleted">[이 메시지는 삭제되었습니다.]</div>
         `;
         if (avatar) row.appendChild(avatar);
         row.appendChild(content);
@@ -936,7 +1019,6 @@ async function addMessage(data) {
         return;
     }
 
-    // --- EVIDENCE ---
     if (data.type === 'evidence') {
         lastSpeaker = null;
         const isMe = data.speaker === 'ME';
@@ -954,24 +1036,6 @@ async function addMessage(data) {
             if (avatar) row.appendChild(avatar);
         }
 
-        let mediaHtml = '';
-        if (data.image) {
-            mediaHtml = `
-                <img src="${data.image}" class="evidence-real-img" alt="evidence image"
-                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                <div class="img-error">(이미지를 불러올 수 없습니다: ${data.image})</div>`;
-        } else if (data.audioMode) {
-            const bars = Array.from({length: 20}, (_, i) =>
-                `<div class="bar" style="animation-duration:${0.3 + Math.random() * 0.6}s; animation-delay:${i * 0.05}s"></div>`
-            ).join('');
-            mediaHtml = `
-                <div class="audio-player">
-                    <div class="play-icon"></div>
-                    <div class="waveform">${bars}</div>
-                    <span class="audio-time">0:47</span>
-                </div>`;
-        }
-
         const content = document.createElement('div');
         content.className = 'msg-content';
         content.innerHTML = `
@@ -979,26 +1043,19 @@ async function addMessage(data) {
             <div class="msg-bubble bubble-${side}">
                 <div class="evidence-box">
                     <div class="evidence-title">${data.title}</div>
-                    ${mediaHtml}
                     <div class="evidence-desc">${data.text}</div>
                 </div>
             </div>
             <span class="msg-time">${time}</span>
         `;
 
-        if (isMe) {
-            row.appendChild(content);
-        } else {
-            row.appendChild(content);
-        }
-
+        row.appendChild(content);
         chatWindow.insertBefore(row, typingRow);
         scrollToBottom();
-        await wait(READING_DELAY + 500);
+        await wait(READING_DELAY + 400);
         return;
     }
 
-    // --- REGULAR MESSAGE ---
     const isMe = data.speaker === 'ME' || (data.speaker && data.speaker.includes('ME'));
     const side = isMe ? 'right' : 'left';
     const sameAsBefore = (lastSpeaker === data.speaker && lastSide === side);
@@ -1015,7 +1072,6 @@ async function addMessage(data) {
             const avatar = createAvatar(data.speaker);
             if (avatar) row.appendChild(avatar);
         } else {
-            // spacer for alignment
             const spacer = document.createElement('div');
             spacer.style.width = '36px';
             spacer.style.minWidth = '36px';
@@ -1031,12 +1087,7 @@ async function addMessage(data) {
         <span class="msg-time">${time}</span>
     `;
 
-    if (isMe) {
-        row.appendChild(content);
-    } else {
-        row.appendChild(content);
-    }
-
+    row.appendChild(content);
     chatWindow.insertBefore(row, typingRow);
     scrollToBottom();
 
@@ -1046,45 +1097,23 @@ async function addMessage(data) {
     await wait(READING_DELAY);
 }
 
-// === GHOST READ (phantom read receipt) ===
-async function showGhostRead(name) {
-    const allRows = chatWindow.querySelectorAll('.msg-row-left');
-    const lastRow = allRows[allRows.length - 1];
-    if (lastRow) {
-        const readDiv = document.createElement('div');
-        readDiv.className = 'read-receipt ghost';
-        readDiv.innerText = `${name} 읽음`;
-        lastRow.querySelector('.msg-content')?.appendChild(readDiv);
-        await wait(2500);
-    }
-}
-// === PROLOGUE ===
 async function playPrologue(data) {
     notifOverlay.innerHTML = '';
     notifOverlay.style.display = 'flex';
 
     for (const notif of data.notifications) {
-        await wait(notif.delay || 1500);
+        await wait(notif.delay || 1200);
 
         const card = document.createElement('div');
         card.className = 'notif-card';
 
-        let imageHtml = '';
-        if (notif.hasImage) {
-            imageHtml = `
-                <div class="notif-image">
-                    <img src="${notif.imageSrc}" onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=&quot;notif-image-placeholder&quot;>이미지를 불러올 수 없습니다</span>';">
-                </div>`;
-        }
-
         card.innerHTML = `
             <div class="notif-header">
                 <div class="notif-app-icon">알림</div>
-                <span class="notif-app-name">${notif.isInvite ? '메신저 초대' : '메신저'}</span>
+                <span class="notif-app-name">메신저</span>
                 <span class="notif-time">지금</span>
             </div>
             <div class="notif-sender">${notif.sender}</div>
-            ${imageHtml}
             <div class="notif-text">${notif.text}</div>
         `;
 
@@ -1092,32 +1121,89 @@ async function playPrologue(data) {
         requestAnimationFrame(() => card.classList.add('visible'));
 
         if (notif.isInvite) {
-            await wait(2000);
+            await wait(1800);
             card.style.cursor = 'pointer';
             card.style.border = '1px solid #555';
 
             await new Promise(resolve => {
                 card.onclick = () => {
-                    notifOverlay.style.transition = 'opacity 0.5s';
+                    notifOverlay.style.transition = 'opacity 0.4s';
                     notifOverlay.style.opacity = '0';
                     setTimeout(() => {
                         notifOverlay.style.display = 'none';
                         resolve();
-                    }, 500);
+                    }, 400);
                 };
                 setTimeout(() => {
-                    notifOverlay.style.transition = 'opacity 0.5s';
+                    notifOverlay.style.transition = 'opacity 0.4s';
                     notifOverlay.style.opacity = '0';
                     setTimeout(() => {
                         notifOverlay.style.display = 'none';
                         resolve();
-                    }, 500);
-                }, 5000);
+                    }, 400);
+                }, 4500);
             });
         }
     }
 }
-// === ENDING SEQUENCE ===
+
+function applyUpdate(update) {
+    if (!update) return;
+    if (update.flags) Object.assign(gameState, update.flags);
+    if (update.suspicion) {
+        Object.keys(update.suspicion).forEach((key) => {
+            gameState.suspicion[key] = (gameState.suspicion[key] || 0) + update.suspicion[key];
+        });
+    }
+    if (update.clue && !gameState.clues.includes(update.clue)) {
+        gameState.clues.push(update.clue);
+    }
+}
+
+function normalizeAnswer(value) {
+    return value.toLowerCase().replace(/\s/g, '');
+}
+
+function determineCulprit() {
+    const priorities = ['taemin', 'hana', 'seoyun', 'me'];
+    let winner = priorities[0];
+    let score = Number.MIN_SAFE_INTEGER;
+
+    priorities.forEach((name) => {
+        const value = gameState.suspicion[name] || 0;
+        if (value > score) {
+            score = value;
+            winner = name;
+        }
+    });
+
+    return winner;
+}
+
+function updateHeaderTimer() {
+    const mm = String(Math.floor(retentionSeconds / 60)).padStart(2, '0');
+    const ss = String(retentionSeconds % 60).padStart(2, '0');
+    headerCount.innerText = `보존 ${mm}:${ss}`;
+    if (retentionSeconds <= 120) {
+        headerCount.classList.add('alert');
+    }
+}
+
+function startRetentionTimer() {
+    if (timerStarted) return;
+    timerStarted = true;
+    updateHeaderTimer();
+
+    setInterval(() => {
+        if (gameEnded) return;
+        retentionSeconds = Math.max(0, retentionSeconds - 1);
+        updateHeaderTimer();
+        if (retentionSeconds === 0 && !gameEnded) {
+            playScene('ending_bad');
+        }
+    }, 1000);
+}
+
 async function playEndingSequence(data) {
     interactionArea.innerHTML = '';
 
@@ -1142,11 +1228,12 @@ async function playEndingSequence(data) {
         }
     }
 
-    await wait(2000);
+    await wait(1500);
     showEnding(data.ending);
 }
 
 function showEnding(ending) {
+    gameEnded = true;
     endingOverlay.style.display = 'flex';
     endingOverlay.style.opacity = '0';
     document.getElementById('ending-title').innerText = ending.title;
@@ -1154,66 +1241,74 @@ function showEnding(ending) {
     endingOverlay.querySelector('.ending-label').innerText = ending.label;
 
     requestAnimationFrame(() => {
-        endingOverlay.style.transition = 'opacity 1.5s';
+        endingOverlay.style.transition = 'opacity 1.2s';
         endingOverlay.style.opacity = '1';
     });
 }
 
-// === MAIN SCENE PLAYER ===
 async function playScene(sceneId) {
+    currentSceneId = sceneId;
     const data = scenario[sceneId];
-    if (!data) return;
+    if (!data || gameEnded) return;
 
-    // Notification (Prologue)
     if (data.type === 'notification') {
         await playPrologue(data);
         if (data.next) playScene(data.next);
         return;
     }
 
-    // Ending sequence
     if (data.type === 'ending_sequence') {
         await playEndingSequence(data);
         return;
     }
 
-    // Count fix (glitch correction)
-    if (data.type === 'count_fix') {
-        await wait(400);
-        headerCount.innerText = data.count;
-        if (data.next) playScene(data.next);
-        return;
-    }
-
-    // Ghost read
-    if (data.type === 'ghost_read') {
-        await showGhostRead(data.target);
-        if (data.next) playScene(data.next);
-        return;
-    }
-
-    // System / date / deleted / evidence / regular message
     if (data.type === 'system' || data.type === 'date' || data.type === 'deleted' || data.type === 'evidence') {
         await addMessage(data);
         if (data.next) playScene(data.next);
         return;
     }
 
-    // Choice
+    if (data.type === 'state_update') {
+        applyUpdate(data.update);
+        if (data.message) await addMessage(data.message);
+        if (data.next) playScene(data.next);
+        return;
+    }
+
+    if (data.type === 'accuse_result') {
+        const culprit = determineCulprit();
+        if (data.target === culprit) {
+            await addMessage({ type: 'system', text: `[판정] 지목 적중: ${culprit.toUpperCase()}` });
+            playScene(data.successNext);
+            return;
+        }
+
+        gameState.accuseAttempts += 1;
+        await addMessage({ type: 'system', text: '[판정] 지목 불일치', subtype: 'error' });
+
+        if (gameState.accuseAttempts < 2) {
+            playScene(data.retryNext);
+        } else {
+            playScene(data.failNext);
+        }
+        return;
+    }
+
     if (data.type === 'choice') {
         if (data.narration) {
             const narr = document.createElement('div');
             narr.className = 'msg-system';
             narr.style.fontStyle = 'italic';
             narr.style.border = 'none';
-            narr.style.color = '#555';
+            narr.style.color = '#666';
             narr.innerText = data.narration;
             chatWindow.insertBefore(narr, typingRow);
             scrollToBottom();
         }
-        await wait(500);
 
+        await wait(450);
         interactionArea.innerHTML = '';
+
         data.options.forEach(opt => {
             const btn = document.createElement('button');
             btn.className = 'btn-choice';
@@ -1228,12 +1323,14 @@ async function playScene(sceneId) {
         return;
     }
 
-    // Input puzzle
     if (data.type === 'input') {
         interactionArea.innerHTML = '';
         const inputGroup = document.createElement('div');
         inputGroup.className = 'input-group';
-        inputGroup.innerHTML = `\n            <input type="text" id="answer-input" placeholder="${data.placeholder || '정답을 입력하세요...'}" autocomplete="off">\n            <button id="submit-btn">전송</button>\n        `;
+        inputGroup.innerHTML = `
+            <input type="text" id="answer-input" placeholder="${data.placeholder || '정답을 입력하세요...'}" autocomplete="off">
+            <button id="submit-btn">전송</button>
+        `;
         interactionArea.appendChild(inputGroup);
 
         const input = inputGroup.querySelector('#answer-input');
@@ -1243,10 +1340,15 @@ async function playScene(sceneId) {
         const checkAnswer = async () => {
             const val = input.value.trim();
             if (!val) return;
+
             interactionArea.innerHTML = '';
             await addMessage({ speaker: 'ME', text: val });
 
-            if (val.replace(/\s/g, '') === data.correctAnswer) {
+            const normalized = normalizeAnswer(val);
+            const acceptAnswers = (data.acceptAnswers || [data.correctAnswer || ''])
+                .map((v) => normalizeAnswer(v));
+
+            if (acceptAnswers.includes(normalized)) {
                 playScene(data.next);
             } else {
                 playScene(data.failNext);
@@ -1258,24 +1360,38 @@ async function playScene(sceneId) {
         return;
     }
 
-    // Regular message with next
     if (data.speaker) {
-        if (data.speedOverride) {
-            const origDelay = TYPING_DELAY;
-            TYPING_DELAY = data.speedOverride;
-            await addMessage(data);
-            TYPING_DELAY = origDelay;
-        } else {
-            await addMessage(data);
-        }
+        await addMessage(data);
         if (data.next) playScene(data.next);
     }
 }
 
-// === START ===
+window.render_game_to_text = () => {
+    const pending = Array.from(interactionArea.querySelectorAll('.btn-choice')).map((btn) => btn.innerText);
+    return JSON.stringify({
+        scene: currentSceneId,
+        retentionSeconds,
+        clues: gameState.clues,
+        suspicion: gameState.suspicion,
+        accuseAttempts: gameState.accuseAttempts,
+        pendingChoices: pending
+    });
+};
+
+window.advanceTime = (ms) => {
+    const seconds = Math.max(0, Math.floor(ms / 1000));
+    if (!gameEnded && seconds > 0) {
+        retentionSeconds = Math.max(0, retentionSeconds - seconds);
+        updateHeaderTimer();
+    }
+};
+
 window.onload = () => {
-    playScene('prologue_retention_notice');
+    roomTitle.innerText = '404호 답하지 않은 밤';
+    startRetentionTimer();
+    playScene('prologue_alarm');
 };
 </script>
 </body>
 </html>
+

@@ -38,3 +38,10 @@ Original prompt: horrochat í´ë”ì— ìˆëŠ” ì±„íŒ… ê²Œì„ í”„ë¡œì íŠ¸ì˜ uië¥¼ 
 - Updated start node to prologue_retention_notice.
 - Fixed broken HTML title tag causing blank white rendering.
 - QA: full branch loop test executed (choice x2, input x3, final choice), evidence sequence and ending overlay activation confirmed; no runtime JS/page errors observed except favicon 404.
+## Update 2026-02-15 (v3 script + game migration)
+- Added new playable script doc: 404_È£_´äÇÏÁö_¾ÊÀº_¹ã_v3_°ÔÀÓ½ºÅ©¸³Æ®.md
+- Replaced index.html scenario with v3 flow (A~H scenes), including C1/E1 choices, deletion-keyword puzzle, and three endings.
+- Added gameplay state handling: state_update nodes, suspicion scoring, culprit evaluation, and one retry for final accusation.
+- Added retention timer UI update (header-count as mm:ss) and timeout fail path.
+- Added window hooks for test tooling: render_game_to_text and advanceTime.
+- Fixed avatar path typo for ÅÂ¹Î profile image.
