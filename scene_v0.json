@@ -1,0 +1,796 @@
+{
+  "meta": {
+    "title": "404호: 답하지 않은 밤",
+    "playtime_minutes": "15-20",
+    "genre": [
+      "심리 스릴러",
+      "사람 공포",
+      "미스터리"
+    ],
+    "notes": [
+      "액자식(과거 로그/개인톡 복구) 제거: 모든 사건은 '지금' 채팅에서만 드러남",
+      "플레이어 호칭은 반드시 실명/닉네임으로 직접 호명(예: 민재). '당신' 금지",
+      "AI 엔딩(A/C 톤)은 엔딩 직전까지 'AI/봇/모델' 단어 금지",
+      "엔진 확장을 전제로 한 JSON: set/if/goto_if를 사용(코덱스가 JS에서 구현/적용)"
+    ],
+    "vars_init": {
+      "PLAYER_NAME": "민재",
+      "pressure": 0,
+      "guilt": 0,
+      "analysis": 0,
+      "aggression": 0,
+      "trust_seoyun": 0,
+      "suspect_taemin": 0,
+      "suspect_hana": 0,
+      "suspect_seoyun": 0,
+      "confession": "none",
+      "intruder_hint_count": 0
+    }
+  },
+  "start": "a0_silence_01",
+  "nodes": {
+    "a0_silence_01": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "서윤",
+      "text": "…",
+      "next": "a0_silence_02"
+    },
+    "a0_silence_02": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "태민",
+      "text": "다들 아직 이 방 안 나갔네",
+      "next": "a0_silence_03"
+    },
+    "a0_silence_03": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "하나",
+      "text": "그냥… 나가기가 좀 그럼",
+      "next": "a0_silence_04"
+    },
+    "a0_silence_04": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "태민",
+      "text": "3일 지났는데도 계속 생각남",
+      "next": "a0_silence_05"
+    },
+    "a0_silence_05": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "서윤",
+      "text": "404호… 그날 새벽만 계속 떠올라",
+      "next": "a0_silence_06"
+    },
+    "a0_silence_06": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "하나",
+      "text": "그 얘기 하지 말자… 오늘은",
+      "next": "a1_intrude_01"
+    },
+    "a1_intrude_01": {
+      "type": "system",
+      "text": "[입장 알림] 404_손님이 들어왔습니다.",
+      "next": "a1_intrude_02"
+    },
+    "a1_intrude_02": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "태민",
+      "text": "누구세요?",
+      "next": "a1_intrude_03"
+    },
+    "a1_intrude_03": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "서윤",
+      "text": "이 방 어떻게 들어왔어",
+      "next": "a1_intrude_04"
+    },
+    "a1_intrude_04": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "404_손님",
+      "text": "지후, 아직 못 깼죠.",
+      "next": "a1_intrude_05"
+    },
+    "a1_intrude_05": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "하나",
+      "text": "…뭐라고?",
+      "next": "a1_intrude_06"
+    },
+    "a1_intrude_06": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "서윤",
+      "text": "너 누구야. 지후 상태를 어떻게 알아?",
+      "next": "a1_intrude_07"
+    },
+    "a1_intrude_07": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "404_손님",
+      "text": "3일 전 새벽. 404호. 그날 끝난 줄 알았죠?",
+      "next": "a1_intrude_08"
+    },
+    "a1_intrude_08": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "태민",
+      "text": "야 장난치지 마",
+      "next": "a1_intrude_09"
+    },
+    "a1_intrude_09": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "하나",
+      "text": "그 이름 함부로 쓰지 마",
+      "next": "a1_intrude_10"
+    },
+    "a1_intrude_10": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "404_손님",
+      "text": "그날 밤 지후가 \"무섭다\"고 했을 때, 누가 먼저 대답했죠?",
+      "next": "a1_intrude_11"
+    },
+    "a1_intrude_11": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "서윤",
+      "text": "…",
+      "next": "a1_intrude_12"
+    },
+    "a1_intrude_12": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "서윤",
+      "text": "아무도. 아무도 제대로 안 했어.",
+      "next": "a1_intrude_13"
+    },
+    "a1_intrude_13": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "태민",
+      "text": "아니 그 상황이—",
+      "next": "a1_intrude_14"
+    },
+    "a1_intrude_14": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "서윤",
+      "text": "변명하지 마.",
+      "next": "a2_target_01"
+    },
+    "a2_target_01": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "404_손님",
+      "text": "그리고 {PLAYER_NAME}.",
+      "next": "a2_target_02"
+    },
+    "a2_target_02": {
+      "type": "set",
+      "set": {
+        "pressure": 1
+      },
+      "next": "a2_target_03"
+    },
+    "a2_target_03": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "태민",
+      "text": "야 갑자기 왜 {PLAYER_NAME} 이름이 나와",
+      "next": "a2_target_04"
+    },
+    "a2_target_04": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "서윤",
+      "text": "…{PLAYER_NAME}?",
+      "next": "a2_target_05"
+    },
+    "a2_target_05": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "하나",
+      "text": "뭐야",
+      "next": "a2_target_06"
+    },
+    "a2_target_06": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "404_손님",
+      "text": "{PLAYER_NAME}가 마지막으로 지후랑 말했잖아.",
+      "next": "a2_target_07"
+    },
+    "a2_target_07": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "서윤",
+      "text": "{PLAYER_NAME}… 진짜야?",
+      "next": "c1_player_response"
+    },
+    "c1_player_response": {
+      "type": "choice",
+      "narration": "{PLAYER_NAME}, 뭐라고 할래?",
+      "options": [
+        {
+          "label": "무슨 소리야, 누구냐 너",
+          "effects": {
+            "aggression": 1,
+            "pressure": 1
+          },
+          "next": "a2_after_c1_01"
+        },
+        {
+          "label": "…뭘 알고 있어?",
+          "effects": {
+            "analysis": 1,
+            "pressure": 1
+          },
+          "next": "a2_after_c1_01"
+        },
+        {
+          "label": "지후 지금 어딨어",
+          "effects": {
+            "guilt": 1,
+            "pressure": 1
+          },
+          "next": "a2_after_c1_01"
+        }
+      ]
+    },
+    "a2_after_c1_01": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "404_손님",
+      "text": "{PLAYER_NAME}는 지금 '기억이 안 난다' 쪽으로 갈 거예요. 보통은.",
+      "next": "a2_after_c1_02"
+    },
+    "a2_after_c1_02": {
+      "type": "set",
+      "set": {
+        "intruder_hint_count": 1
+      },
+      "next": "a2_after_c1_03"
+    },
+    "a2_after_c1_03": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "태민",
+      "text": "뭐야 저 말투",
+      "next": "a2_after_c1_04"
+    },
+    "a2_after_c1_04": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "404_손님",
+      "text": "확인만 할게요. {PLAYER_NAME}. 그날 \"오늘은 그냥 자\"라고 했죠?",
+      "next": "pz1_input_quote"
+    },
+    "pz1_input_quote": {
+      "type": "choice",
+      "narration": "그날 네가 했던 문장을 그대로 입력해봐",
+      "options": [
+        {
+          "label": "오늘은 그냥 자",
+          "effects": {
+            "pressure": 1,
+            "guilt": 1
+          },
+          "next": "a3_after_pz1_01"
+        },
+        {
+          "label": "나도 힘들어",
+          "effects": {
+            "pressure": 1
+          },
+          "next": "a3_after_pz1_01"
+        },
+        {
+          "label": "잠깐만 기다려",
+          "effects": {
+            "pressure": 1
+          },
+          "next": "a3_after_pz1_01"
+        }
+      ]
+    },
+    "a3_after_pz1_01": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "서윤",
+      "text": "…너 진짜 그 말 했어?",
+      "next": "a3_after_pz1_02"
+    },
+    "a3_after_pz1_02": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "하나",
+      "text": "그때 지후… 숨 이상하다고 했는데",
+      "next": "a3_after_pz1_03"
+    },
+    "a3_after_pz1_03": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "태민",
+      "text": "야 근데 솔직히… 우리도 다 비슷했잖아",
+      "next": "a3_after_pz1_04"
+    },
+    "a3_after_pz1_04": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "서윤",
+      "text": "비슷한 게 면죄부야?",
+      "next": "a3_intruder_push_01"
+    },
+    "a3_intruder_push_01": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "404_손님",
+      "text": "좋아요. 그럼 다음. 누가 먼저 '전화'를 꺼냈죠?",
+      "next": "c2_phone_blame"
+    },
+    "c2_phone_blame": {
+      "type": "choice",
+      "narration": "누가 먼저 전화 얘기를 했다고 말할래?",
+      "options": [
+        {
+          "label": "내가(민재)가 먼저 전화하자고 했어",
+          "effects": {
+            "guilt": 1,
+            "analysis": 1,
+            "pressure": 1
+          },
+          "next": "a3_after_c2_01"
+        },
+        {
+          "label": "태민이 먼저 전화 얘기했어",
+          "effects": {
+            "suspect_taemin": 1,
+            "pressure": 1
+          },
+          "next": "a3_after_c2_01"
+        },
+        {
+          "label": "하나가 먼저 말했어",
+          "effects": {
+            "suspect_hana": 1,
+            "pressure": 1
+          },
+          "next": "a3_after_c2_01"
+        },
+        {
+          "label": "서윤이 먼저였어",
+          "effects": {
+            "suspect_seoyun": 1,
+            "pressure": 1
+          },
+          "next": "a3_after_c2_01"
+        }
+      ]
+    },
+    "a3_after_c2_01": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "404_손님",
+      "text": "흥미롭네요. 각자 기억이 다르다는 게.",
+      "next": "a3_after_c2_02"
+    },
+    "a3_after_c2_02": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "태민",
+      "text": "야 너 진짜 뭐야? 우리 지금 조사 받는 거야?",
+      "next": "a3_after_c2_03"
+    },
+    "a3_after_c2_03": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "404_손님",
+      "text": "조사 아니에요. 훨씬 간단해요. '도망'만 확인하면 돼요.",
+      "next": "a3_after_c2_04"
+    },
+    "a3_after_c2_04": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "하나",
+      "text": "…그만해. 지금 그 얘기 꺼내서 뭐가 달라져",
+      "next": "a3_after_c2_05"
+    },
+    "a3_after_c2_05": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "404_손님",
+      "text": "달라지죠. {PLAYER_NAME}는 아직도 '그날'을 가볍게 만들고 싶어하니까.",
+      "next": "a4_reveal_state_01"
+    },
+    "a4_reveal_state_01": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "404_손님",
+      "text": "지후는 아직 못 깼어요. 지금도.",
+      "next": "a4_reveal_state_02"
+    },
+    "a4_reveal_state_02": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "서윤",
+      "text": "…그걸 어떻게 알아",
+      "next": "a4_reveal_state_03"
+    },
+    "a4_reveal_state_03": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "태민",
+      "text": "야 너 병원 쪽 사람이야?",
+      "next": "a4_reveal_state_04"
+    },
+    "a4_reveal_state_04": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "404_손님",
+      "text": "사람이면, 이렇게까지 정확할 필요 없죠.",
+      "next": "a4_reveal_state_05"
+    },
+    "a4_reveal_state_05": {
+      "type": "set",
+      "set": {
+        "intruder_hint_count": 2,
+        "analysis": 1
+      },
+      "next": "a4_reveal_state_06"
+    },
+    "a4_reveal_state_06": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "하나",
+      "text": "…나 소름 돋아. 이거 뭐야",
+      "next": "a4_reveal_state_07"
+    },
+    "a4_reveal_state_07": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "404_손님",
+      "text": "이제부터는 질문 하나만 할게요. {PLAYER_NAME}, 마지막으로.",
+      "next": "a5_final_test_01"
+    },
+    "a5_final_test_01": {
+      "type": "chat",
+      "channel": "now",
+      "speaker": "404_손님",
+      "text": "{PLAYER_NAME}. 여기서 한 문장만 쓰세요.",
+      "next": "c3_final_sentence"
+    },
+    "c3_final_sentence": {
+      "type": "choice",
+      "narration": "한 문장으로 끝내라면?",
+      "options": [
+        {
+          "label": "내가 답하지 않았다",
+          "effects": {
+            "guilt": 2,
+            "confession": "admit"
+          },
+          "next": "branch_endings"
+        },
+        {
+          "label": "내가 무서워서 피했다",
+          "effects": {
+            "guilt": 1,
+            "confession": "fear"
+          },
+          "next": "branch_endings"
+        },
+        {
+          "label": "내가 아니라 다른 사람이 먼저였다",
+          "effects": {
+            "aggression": 1,
+            "confession": "blame"
+          },
+          "next": "branch_endings"
+        },
+        {
+          "label": "난 모른다",
+          "effects": {
+            "analysis": 1,
+            "confession": "deny"
+          },
+          "next": "branch_endings"
+        }
+      ]
+    },
+    "branch_endings": {
+      "type": "branch",
+      "rules": [
+        {
+          "if": {
+            "all": [
+              {
+                "var": "analysis",
+                "gte": 2
+              },
+              {
+                "var": "intruder_hint_count",
+                "gte": 2
+              }
+            ]
+          },
+          "goto": "ending_ai"
+        },
+        {
+          "if": {
+            "all": [
+              {
+                "var": "confession",
+                "eq": "admit"
+              }
+            ]
+          },
+          "goto": "ending_jihu"
+        },
+        {
+          "if": {
+            "all": [
+              {
+                "var": "confession",
+                "eq": "fear"
+              },
+              {
+                "var": "guilt",
+                "gte": 2
+              }
+            ]
+          },
+          "goto": "ending_jihu"
+        },
+        {
+          "if": {
+            "all": [
+              {
+                "var": "confession",
+                "eq": "blame"
+              },
+              {
+                "var": "suspect_taemin",
+                "gte": 1
+              }
+            ]
+          },
+          "goto": "ending_taemin"
+        },
+        {
+          "if": {
+            "all": [
+              {
+                "var": "confession",
+                "eq": "blame"
+              }
+            ]
+          },
+          "goto": "ending_sibling"
+        },
+        {
+          "if": {
+            "all": [
+              {
+                "var": "confession",
+                "eq": "deny"
+              }
+            ]
+          },
+          "goto": "ending_ai"
+        }
+      ],
+      "default": "ending_sibling"
+    },
+    "ending_ai": {
+      "type": "ending_sequence",
+      "sequence": [
+        {
+          "type": "system",
+          "text": "[연결 정보] 세션 분석 중…"
+        },
+        {
+          "speaker": "404_손님",
+          "text": "예상과 거의 같네요."
+        },
+        {
+          "speaker": "서윤",
+          "text": "뭐가…"
+        },
+        {
+          "speaker": "404_손님",
+          "text": "{PLAYER_NAME}는 부정으로 갈 확률이 가장 높았어요."
+        },
+        {
+          "speaker": "태민",
+          "text": "확률? 야 너…"
+        },
+        {
+          "type": "system",
+          "text": "[메타] 응답 패턴 일치율 0.87"
+        },
+        {
+          "speaker": "404_손님",
+          "text": "지후는 여러분 반응을 미리 가정했어요. 그리고… 꽤 맞았죠."
+        },
+        {
+          "type": "system",
+          "text": "[공개] 404_손님 = JH-Respond (사전 생성된 자동응답 세션)"
+        },
+        {
+          "speaker": "404_손님",
+          "text": "차갑게 말할게요. 여러분은 예측 가능한 사람이었어요."
+        },
+        {
+          "speaker": "404_손님",
+          "text": "남은 건 하나."
+        },
+        {
+          "speaker": "404_손님",
+          "text": "{PLAYER_NAME}, 예측에서 벗어날 선택을 할 수 있나요?"
+        }
+      ],
+      "ending": {
+        "label": "AI 엔딩",
+        "title": "예측 성공률 87%",
+        "desc": "지후는 떠나기 전에 ‘너희가 어떤 사람인지’를 남겼다. 무서운 건 AI가 아니라, 예측이 틀리지 않았다는 사실이다."
+      }
+    },
+    "ending_jihu": {
+      "type": "ending_sequence",
+      "sequence": [
+        {
+          "type": "system",
+          "text": "[연결 변경] 새로운 발신자가 나타났습니다."
+        },
+        {
+          "speaker": "404_손님",
+          "text": "{PLAYER_NAME}… 이제야 쓰네."
+        },
+        {
+          "speaker": "하나",
+          "text": "…지후야?"
+        },
+        {
+          "speaker": "404_손님",
+          "text": "내가 듣고 싶었던 건 딱 한 문장이었어."
+        },
+        {
+          "speaker": "서윤",
+          "text": "너… 살아있어?"
+        },
+        {
+          "speaker": "404_손님",
+          "text": "그건 중요하지 않아. 중요한 건…"
+        },
+        {
+          "speaker": "404_손님",
+          "text": "너희가 끝까지 ‘괜찮다’는 말 하나를 아껴뒀다는 거야."
+        },
+        {
+          "speaker": "404_손님",
+          "text": "{PLAYER_NAME}, 이제라도… 늦었지만."
+        }
+      ],
+      "ending": {
+        "label": "지후 엔딩",
+        "title": "늦은 한 문장",
+        "desc": "지후(혹은 지후의 목소리)는 마지막으로 한 문장을 원했다. 공포는 사라지지 않는다. 다만, 말하지 않은 말이 더 크게 남는다."
+      }
+    },
+    "ending_sibling": {
+      "type": "ending_sequence",
+      "sequence": [
+        {
+          "type": "system",
+          "text": "[연결 정보] 사용자 인증 업데이트"
+        },
+        {
+          "speaker": "404_손님",
+          "text": "전 지후 가족이에요."
+        },
+        {
+          "speaker": "태민",
+          "text": "…뭐?"
+        },
+        {
+          "speaker": "404_손님",
+          "text": "병원에서… 그날 통화 기록이 마지막이었어요."
+        },
+        {
+          "speaker": "404_손님",
+          "text": "그리고 전 알아요. 여러분이 서로를 먼저 생각했다는 것도."
+        },
+        {
+          "speaker": "서윤",
+          "text": "왜 지금 이 방에…"
+        },
+        {
+          "speaker": "404_손님",
+          "text": "확인하려고요. 누가 끝까지 ‘미안’조차 못 쓰는지."
+        },
+        {
+          "speaker": "404_손님",
+          "text": "{PLAYER_NAME}. 오늘도 당신은…"
+        }
+      ],
+      "ending": {
+        "label": "제3자 엔딩",
+        "title": "밖에서 보던 사람",
+        "desc": "이건 우리끼리의 일이 아니었다. 누군가의 가족에게는, 단 한 문장이 생사였다."
+      }
+    },
+    "ending_taemin": {
+      "type": "ending_sequence",
+      "sequence": [
+        {
+          "type": "system",
+          "text": "[권한 확인] 404_손님: 내부 초대 기록 발견"
+        },
+        {
+          "speaker": "서윤",
+          "text": "초대 기록…?"
+        },
+        {
+          "speaker": "404_손님",
+          "text": "태민이었어요. 이 방을 다시 열어준 사람."
+        },
+        {
+          "speaker": "태민",
+          "text": "야 아니…"
+        },
+        {
+          "speaker": "404_손님",
+          "text": "태민은 알고 있었죠. 표적 하나 세우면 다 편해진다는 걸."
+        },
+        {
+          "speaker": "태민",
+          "text": "살려고 그랬어… 나만 욕먹기 싫어서…"
+        },
+        {
+          "speaker": "서윤",
+          "text": "그래서 {PLAYER_NAME}부터 꺼낸 거야?"
+        },
+        {
+          "speaker": "태민",
+          "text": "…미안. 근데 너희도 다…"
+        },
+        {
+          "speaker": "404_손님",
+          "text": "끝."
+        }
+      ],
+      "ending": {
+        "label": "전가 엔딩",
+        "title": "표적을 만든 사람",
+        "desc": "태민은 살기 위해 ‘쉬운 표적’을 만들었다. 공포는 괴물이 아니라, 우리가 너무 쉽게 한 사람을 고른다는 사실이다."
+      }
+    },
+    "bad_timeout": {
+      "type": "ending_sequence",
+      "sequence": [
+        {
+          "type": "system",
+          "text": "[타임아웃] 채팅이 종료되었습니다."
+        },
+        {
+          "type": "system",
+          "text": "남은 건… 아무것도 없습니다."
+        }
+      ],
+      "ending": {
+        "label": "배드 엔딩",
+        "title": "정적",
+        "desc": "아무도 말하지 않았다. 그래서 아무것도 바뀌지 않았다."
+      }
+    }
+  }
+}

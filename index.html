@@ -553,13 +553,15 @@ const notifOverlay = document.getElementById("notification-overlay");
 const endingOverlay = document.getElementById("ending-overlay");
 const roomTitle = document.getElementById("room-title");
 
-let scenarioData = null;
+let scenarioRoot = null;
+let nodeMap = null;
 let currentNodeId = null;
 let currentTime = { h: 2, m: 10 };
 let ended = false;
 let lastSpeaker = null;
 let lastSide = null;
 let lastChannel = null;
+let stateVars = {};
 
 function wait(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -592,6 +594,7 @@ function resolveCharacterKey(speaker) {
     if (!speaker) return "UNKNOWN";
     const s = String(speaker).trim();
     if (isMeSpeaker(s)) return "ME";
+    if (s.includes("404_손님") || s.includes("404")) return "UNKNOWN";
     if (s.includes("서윤") || /seoyun/i.test(s)) return "서윤";
     if (s.includes("태민") || /taemin/i.test(s)) return "태민";
     if (s.includes("하나") || /hana/i.test(s)) return "하나";
@@ -642,7 +645,7 @@ async function addDateMessage(text) {
 }
 
 async function addChatMessage(node) {
-    const speaker = node.speaker || "UNKNOWN";
+    const speaker = interpolate(node.speaker || "UNKNOWN");
     const isMe = isMeSpeaker(speaker);
     const side = isMe ? "right" : "left";
     const channel = node.channel || null;
@@ -676,7 +679,7 @@ async function addChatMessage(node) {
     const content = document.createElement("div");
     content.className = "msg-content";
     const senderName = !isMe && !sameAsBefore ? `<span class="sender-name">${speaker}</span>` : "";
-    content.innerHTML = `${senderName}<div class="msg-bubble bubble-${side}">${node.text || ""}</div><span class="msg-time">${getTime()}</span>`;
+    content.innerHTML = `${senderName}<div class="msg-bubble bubble-${side}">${interpolate(node.text || "")}</div><span class="msg-time">${getTime()}</span>`;
 
     row.appendChild(content);
     chatWindow.insertBefore(row, typingRow);
@@ -694,7 +697,7 @@ async function playEndingSequence(node) {
     for (const step of sequence) {
         if (step.delay) await wait(step.delay);
         if (step.type === "system") {
-            await addSystemMessage(step.text || "", step.subtype);
+            await addSystemMessage(interpolate(step.text || ""), step.subtype);
         } else {
             await addChatMessage(step);
         }
@@ -709,71 +712,96 @@ function showEnding(ending) {
     ended = true;
     endingOverlay.style.display = "flex";
     endingOverlay.style.opacity = "0";
-    endingOverlay.querySelector(".ending-label").innerText = ending.label || "엔딩";
-    document.getElementById("ending-title").innerText = ending.title || "";
-    document.getElementById("ending-desc").innerText = ending.desc || "";
+    endingOverlay.querySelector(".ending-label").innerText = interpolate(ending.label || "엔딩");
+    document.getElementById("ending-title").innerText = interpolate(ending.title || "");
+    document.getElementById("ending-desc").innerText = interpolate(ending.desc || "");
     requestAnimationFrame(() => {
         endingOverlay.style.transition = "opacity 1.2s";
         endingOverlay.style.opacity = "1";
     });
 }
 
-function gatherReferences(scenario) {
+function interpolate(text) {
+    return String(text || "").replace(/\{([A-Z0-9_]+)\}/g, (m, key) => {
+        if (Object.prototype.hasOwnProperty.call(stateVars, key)) {
+            return String(stateVars[key]);
+        }
+        return m;
+    });
+}
+
+function gatherReferences(root) {
     const refs = [];
-    for (const [id, node] of Object.entries(scenario)) {
-        if (id === "start") continue;
+    const nodes = (root && root.nodes) ? root.nodes : {};
+    for (const [id, node] of Object.entries(nodes)) {
         if (node.next) refs.push({ from: id, to: node.next, kind: "next" });
-        if (node.failNext) refs.push({ from: id, to: node.failNext, kind: "failNext" });
         if (node.type === "choice" && Array.isArray(node.options)) {
             node.options.forEach((opt, i) => {
                 if (opt && opt.next) refs.push({ from: id, to: opt.next, kind: `choice[${i}]` });
             });
         }
+        if (node.type === "branch" && Array.isArray(node.rules)) {
+            node.rules.forEach((rule, i) => {
+                if (rule && rule.goto) refs.push({ from: id, to: rule.goto, kind: `branch[${i}]` });
+            });
+            if (node.default) refs.push({ from: id, to: node.default, kind: "branch.default" });
+        }
+        if (node.type === "input") {
+            refs.push({ from: id, to: "__INPUT_NOT_ALLOWED__", kind: "input" });
+        }
     }
     return refs;
 }
 
-function validateScenario(scenario) {
+function validateScenario(root) {
     const errors = [];
-    if (!scenario || typeof scenario !== "object") {
-        errors.push("scenario.json root must be an object");
+    if (!root || typeof root !== "object") {
+        errors.push("scene_v0.json root must be an object");
         return errors;
     }
-    if (!scenario.start || !scenario[scenario.start]) {
+    const nodes = root.nodes || {};
+    if (!root.start || !nodes[root.start]) {
         errors.push("missing or invalid 'start' node");
     }
 
-    const refs = gatherReferences(scenario);
+    const refs = gatherReferences(root);
     for (const ref of refs) {
-        if (!scenario[ref.to]) {
+        if (ref.to === "__INPUT_NOT_ALLOWED__") {
+            errors.push(`input node is not allowed: ${ref.from}`);
+            continue;
+        }
+        if (!nodes[ref.to]) {
             errors.push(`broken reference: ${ref.from} -> ${ref.to} (${ref.kind})`);
         }
     }
 
-    if (scenario.start && scenario[scenario.start]) {
+    if (root.start && nodes[root.start]) {
         const visited = new Set();
-        const queue = [scenario.start];
+        const queue = [root.start];
         while (queue.length > 0) {
             const id = queue.shift();
             if (visited.has(id)) continue;
             visited.add(id);
-            const node = scenario[id];
+            const node = nodes[id];
             if (!node) continue;
             if (node.next) queue.push(node.next);
-            if (node.failNext) queue.push(node.failNext);
             if (node.type === "choice" && Array.isArray(node.options)) {
                 node.options.forEach((opt) => {
                     if (opt && opt.next) queue.push(opt.next);
                 });
             }
+            if (node.type === "branch" && Array.isArray(node.rules)) {
+                node.rules.forEach((rule) => {
+                    if (rule && rule.goto) queue.push(rule.goto);
+                });
+                if (node.default) queue.push(node.default);
+            }
         }
 
-        Object.keys(scenario).forEach((id) => {
-            if (id === "start") return;
-            if (!visited.has(id)) {
-                errors.push(`unreachable node: ${id}`);
-            }
-        });
+        const unreachable = Object.keys(nodes).filter((id) => !visited.has(id));
+        if (unreachable.length > 0) {
+            console.warn("[scene_v0] unreachable nodes:", unreachable);
+        }
     }
 
     return errors;
@@ -781,7 +809,7 @@ function validateScenario(scenario) {
 
 function showLoadError(lines) {
     const msg = Array.isArray(lines) ? lines.join("\n") : String(lines || "unknown error");
-    addSystemMessage(`[시나리오 로드 실패]\n${msg}`, "error");
+    addSystemMessage(`[scene_v0 로드 실패]\n${msg}`, "error");
     interactionArea.innerHTML = "";
     const retry = document.createElement("button");
     retry.className = "btn-choice";
@@ -790,17 +818,65 @@ function showLoadError(lines) {
     interactionArea.appendChild(retry);
 }
 
+function applyEffects(effects) {
+    if (!effects || typeof effects !== "object") return;
+    Object.entries(effects).forEach(([key, value]) => {
+        const prev = stateVars[key];
+        if (typeof prev === "number" && typeof value === "number") {
+            stateVars[key] = prev + value;
+        } else {
+            stateVars[key] = value;
+        }
+    });
+}
+
+function evalCondition(cond) {
+    if (!cond || typeof cond !== "object") return false;
+    if (Array.isArray(cond.all)) {
+        return cond.all.every((rule) => evalCondition(rule));
+    }
+
+    const name = cond.var;
+    const actual = stateVars[name];
+    if (Object.prototype.hasOwnProperty.call(cond, "eq")) return actual === cond.eq;
+    if (Object.prototype.hasOwnProperty.call(cond, "neq")) return actual !== cond.neq;
+    if (Object.prototype.hasOwnProperty.call(cond, "gt")) return Number(actual) > Number(cond.gt);
+    if (Object.prototype.hasOwnProperty.call(cond, "gte")) return Number(actual) >= Number(cond.gte);
+    if (Object.prototype.hasOwnProperty.call(cond, "lt")) return Number(actual) < Number(cond.lt);
+    if (Object.prototype.hasOwnProperty.call(cond, "lte")) return Number(actual) <= Number(cond.lte);
+    return false;
+}
+
 async function playNode(nodeId) {
     if (ended) return;
     currentNodeId = nodeId;
-    const node = scenarioData[nodeId];
+    const node = nodeMap[nodeId];
     if (!node) {
         await addSystemMessage(`[오류] 존재하지 않는 노드: ${nodeId}`, "error");
         return;
     }
 
+    if (node.type === "set") {
+        applyEffects(node.set);
+        if (node.next) return playNode(node.next);
+        return;
+    }
+
+    if (node.type === "branch") {
+        const rules = Array.isArray(node.rules) ? node.rules : [];
+        for (const rule of rules) {
+            if (evalCondition(rule.if)) {
+                if (rule.goto) return playNode(rule.goto);
+                break;
+            }
+        }
+        if (node.default) return playNode(node.default);
+        await addSystemMessage(`[오류] branch default 누락: ${nodeId}`, "error");
+        return;
+    }
+
     if (node.type === "system") {
-        await addSystemMessage(node.text || "", node.subtype);
+        await addSystemMessage(interpolate(node.text || ""), node.subtype);
         if (node.next) return playNode(node.next);
         return;
     }
@@ -818,20 +894,26 @@ async function playNode(nodeId) {
 
     if (node.type === "choice") {
         if (node.narration) {
-            await addSystemMessage(node.narration);
+            await addSystemMessage(interpolate(node.narration));
         }
         interactionArea.innerHTML = "";
         (node.options || []).forEach((opt) => {
             const btn = document.createElement("button");
             btn.className = "btn-choice";
-            btn.innerText = opt.label || "선택";
+            btn.innerText = interpolate(opt.label || "선택");
             btn.onclick = async () => {
                 interactionArea.innerHTML = "";
-                await addChatMessage({ speaker: "ME", text: opt.label || "선택" });
+                await addChatMessage({ speaker: "ME", text: interpolate(opt.label || "선택") });
+                applyEffects(opt.effects);
                 if (opt.next) playNode(opt.next);
             };
             interactionArea.appendChild(btn);
         });
+        return;
+    }
+
+    if (node.type === "input") {
+        await addSystemMessage(`[오류] input 타입은 비활성화되었습니다: ${nodeId}`, "error");
         return;
     }
 
@@ -859,7 +941,7 @@ async function bootstrap() {
     notifOverlay.style.display = "none";
 
     try {
-        const response = await fetch("./scenario.json", { cache: "no-store" });
+        const response = await fetch("./scene_v0.json", { cache: "no-store" });
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
         }
@@ -870,8 +952,13 @@ async function bootstrap() {
             throw new Error(errors.slice(0, 8).join("\n"));
         }
 
-        scenarioData = parsed;
-        playNode(scenarioData.start);
+        scenarioRoot = parsed;
+        nodeMap = parsed.nodes || {};
+        stateVars = Object.assign({ PLAYER_NAME: "민재" }, (parsed.meta && parsed.meta.vars_init) ? parsed.meta.vars_init : {});
+        if (parsed.meta && parsed.meta.title) {
+            roomTitle.innerText = interpolate(parsed.meta.title);
+        }
+        playNode(parsed.start);
     } catch (error) {
         showLoadError(error.message || String(error));
     }
