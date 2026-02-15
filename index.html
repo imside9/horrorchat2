@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>404?? ?섏젙 ?꾩웳</title>
+    <title>404호 답하지 않은 밤</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
 
@@ -525,20 +525,20 @@
 
     <!-- ENDING OVERLAY -->
     <div id="ending-overlay">
-        <div class="ending-label">?붾뵫</div>
+        <div class="ending-label">엔딩</div>
         <div class="ending-title" id="ending-title"></div>
         <div class="ending-desc" id="ending-desc"></div>
-        <button class="ending-restart" onclick="location.reload()">?ㅼ떆 ?뚮젅??/button>
+        <button class="ending-restart" onclick="location.reload()">다시 플레이</button>
     </div>
 
     <header>
-        <span class="header-back">??/span>
+        <span class="header-back">←</span>
         <div class="header-info">
-            <div class="room-title" id="room-title">404??議곗젙 梨꾪똿諛?/div>
-            <div class="user-count" id="header-count">李몄뿬??4紐?/div>
+            <div class="room-title" id="room-title">404호 단체 채팅방</div>
+            <div class="user-count" id="header-count">참여자 4명</div>
         </div>
         <div class="header-icons">
-            <span>??/span>
+            <span>⋯</span>
         </div>
     </header>
 
@@ -558,375 +558,44 @@
 </div>
 
 <script>
-// 404호: 답하지 않은 밤 v3 game script
-let TYPING_DELAY = 1200;
-const READING_DELAY = 800;
-let currentTime = { h: 2, m: 9 };
-let currentSceneId = "prologue_alarm";
-let gameEnded = false;
-let timerStarted = false;
-let retentionSeconds = 20 * 60;
-
-const gameState = {
-    c1: null,
-    e1: null,
-    accuseAttempts: 0,
-    empathyRoute: false,
-    conspiracyRoute: false,
-    clues: [],
-    suspicion: {
-        seoyun: 1,
-        taemin: 1,
-        hana: 1,
-        me: 1
-    }
-};
+// scenario.json single-source runtime
+const READING_DELAY = 550;
+const TYPING_DELAY = 700;
+const INPUT_PLACEHOLDER = "정답을 입력하세요...";
 
 const CHARACTERS = {
-    "서윤": {
-        avatarClass: "avatar-jisu",
-        avatarImg: "./images/profile_jisu.png",
-        avatarFallback: "SY",
-        color: "#aa66cc"
-    },
-    "태민": {
-        avatarClass: "avatar-younghun",
-        avatarImg: "./images/profile_younghun.png",
-        avatarFallback: "TM",
-        color: "#5588cc"
-    },
-    "하나": {
-        avatarClass: "avatar-jisu",
-        avatarImg: "./images/profile_jisu.png",
-        avatarFallback: "HN",
-        color: "#c48f5a"
-    },
-    "지후": {
-        avatarClass: "avatar-unknown",
-        avatarImg: "./images/profile_unknown.png",
-        avatarFallback: "JH",
-        color: "#777"
-    }
+    "서윤": { avatarClass: "avatar-jisu", avatarImg: "./images/profile_jisu.png", avatarFallback: "SY" },
+    "태민": { avatarClass: "avatar-younghun", avatarImg: "./images/profile_younghun.png", avatarFallback: "TM" },
+    "하나": { avatarClass: "avatar-jisu", avatarImg: "./images/profile_jisu.png", avatarFallback: "HN" },
+    "지후": { avatarClass: "avatar-unknown", avatarImg: "./images/profile_unknown.png", avatarFallback: "JH" },
+    "ME": { avatarClass: "avatar-me", avatarImg: "./images/profile_me.png", avatarFallback: "ME" },
+    "UNKNOWN": { avatarClass: "avatar-unknown", avatarImg: "./images/profile_unknown.png", avatarFallback: "?" }
 };
 
-const scenario = {
-    prologue_alarm: {
-        type: "notification",
-        notifications: [
-            { delay: 900, sender: "시스템", text: "404호 단체 채팅방이 복원되었습니다." },
-            { delay: 1500, sender: "시스템", text: "삭제 로그 23개가 감지되었습니다." },
-            { delay: 1900, sender: "시스템", text: "보존 만료까지 20분", isInvite: true }
-        ],
-        next: "scene_a_entry"
-    },
-    scene_a_entry: {
-        type: "system",
-        text: "[시스템] 복구 작업이 시작되었습니다.",
-        next: "scene_a_date"
-    },
-    scene_a_date: {
-        type: "date",
-        text: "2026년 2월 15일 일요일 · 현재 02:10",
-        next: "scene_b_log"
-    },
-    scene_b_log: {
-        type: "evidence",
-        speaker: "서윤",
-        title: "3일 전 로그 01:10~01:15",
-        text: "01:10 지후: 너 지금 어디야\n01:11 지후: 약 잘못 먹은 것 같아\n01:12 지후: 숨이 이상해\n01:15 지후: 전화 좀 받아줘\n(읽음 4)",
-        next: "scene_b_react_1"
-    },
-    scene_b_react_1: { speaker: "서윤", text: "우리 다 읽었네.", next: "scene_b_react_2" },
-    scene_b_react_2: { speaker: "태민", text: "저때도 또 시작인가 싶었지.", next: "scene_b_react_3" },
-    scene_b_react_3: { speaker: "하나", text: "전화 한 통은 했어야지.", next: "scene_c_private_intro" },
+const chatWindow = document.getElementById("chat-window");
+const interactionArea = document.getElementById("interaction-area");
+const headerCount = document.getElementById("header-count");
+const typingRow = document.getElementById("typing-row");
+const typingAvatar = document.getElementById("typing-avatar");
+const notifOverlay = document.getElementById("notification-overlay");
+const endingOverlay = document.getElementById("ending-overlay");
+const roomTitle = document.getElementById("room-title");
 
-    scene_c_private_intro: {
-        type: "system",
-        text: "[시스템] 삭제된 개인 메시지 1건이 복원되었습니다.",
-        next: "scene_c_private_evidence"
-    },
-    scene_c_private_evidence: {
-        type: "evidence",
-        speaker: "지후",
-        title: "지후 -> 나 개인톡",
-        text: "01:11 지후: 너만이라도 좀\n01:13 나: [삭제됨]",
-        next: "scene_c_chat_1"
-    },
-    scene_c_chat_1: { speaker: "서윤", text: "잠깐. 개인톡이 왜 여기 떠?", next: "scene_c_chat_2" },
-    scene_c_chat_2: { speaker: "태민", text: "너한테 먼저 보냈네?", next: "scene_c_choice" },
-    scene_c_choice: {
-        type: "choice",
-        narration: "뭐라고 답할까?",
-        options: [
-            { label: "기억이 잘 안 나.", next: "scene_c1_memory" },
-            { label: "겁나서 못 했어.", next: "scene_c1_fear" },
-            { label: "지금 나 몰아가려고 복구한 거 아냐?", next: "scene_c1_frame" }
-        ]
-    },
-    scene_c1_memory: {
-        type: "state_update",
-        update: {
-            flags: { c1: "memory" },
-            suspicion: { me: 2, taemin: 1 },
-            clue: "개인톡 삭제 당사자가 나라는 사실이 확정됨"
-        },
-        message: { type: "system", text: "[기록] 진술 신뢰도 하락", subtype: "error" },
-        next: "scene_d_gap"
-    },
-    scene_c1_fear: {
-        type: "state_update",
-        update: {
-            flags: { c1: "fear", empathyRoute: true },
-            suspicion: { me: 1, taemin: 1 },
-            clue: "회피가 두려움에서 왔다는 진술 확보"
-        },
-        message: { speaker: "하나", text: "무서웠다는 건 알겠어. 근데 답은 안 했잖아." },
-        next: "scene_d_gap"
-    },
-    scene_c1_frame: {
-        type: "state_update",
-        update: {
-            flags: { c1: "frame", conspiracyRoute: true },
-            suspicion: { taemin: 2, hana: 1 },
-            clue: "복구가 의도적 표적화라는 가설 생성"
-        },
-        message: { speaker: "태민", text: "그 말은 누가 널 일부러 흔들었다는 거네." },
-        next: "scene_d_gap"
-    },
+let scenarioData = null;
+let currentNodeId = null;
+let currentTime = { h: 2, m: 10 };
+let ended = false;
+let lastSpeaker = null;
+let lastSide = null;
+let lastChannel = null;
 
-    scene_d_gap: {
-        type: "system",
-        text: "[시스템] 01:19~01:25 구간이 수동 삭제된 것으로 확인됩니다.",
-        next: "scene_d_react_1"
-    },
-    scene_d_react_1: { speaker: "서윤", text: "자동 삭제가 아니라 누가 지운 거네.", next: "scene_d_react_2" },
-    scene_d_react_2: { speaker: "태민", text: "근데 그걸 왜 지금 복구해?", next: "scene_d_react_3" },
-    scene_d_react_3: { speaker: "하나", text: "복구한 사람이 범인일 수도 있고, 증인일 수도 있지.", next: "scene_d_puzzle_intro" },
-    scene_d_puzzle_intro: {
-        type: "system",
-        text: "[퍼즐] 삭제 문장의 핵심 키워드를 복원하세요.",
-        next: "puzzle_d1_try1"
-    },
-    puzzle_d1_try1: {
-        type: "input",
-        placeholder: "정답 키워드 입력 (예: 나도힘들어)",
-        acceptAnswers: ["나도힘들어", "나도 힘들어"],
-        next: "scene_d_puzzle_ok",
-        failNext: "puzzle_d1_hint1"
-    },
-    puzzle_d1_hint1: {
-        type: "system",
-        text: "[힌트1] 지후의 마지막 반응은 '...알겠어'였다.",
-        next: "puzzle_d1_try2"
-    },
-    puzzle_d1_try2: {
-        type: "input",
-        placeholder: "정답 키워드 입력 (힌트: 6글자)",
-        acceptAnswers: ["나도힘들어", "나도 힘들어"],
-        next: "scene_d_puzzle_ok",
-        failNext: "puzzle_d1_hint2"
-    },
-    puzzle_d1_hint2: {
-        type: "system",
-        text: "[힌트2] 답장은 위로가 아니라 회피였다.",
-        subtype: "error",
-        next: "puzzle_d1_try3"
-    },
-    puzzle_d1_try3: {
-        type: "input",
-        placeholder: "정답 키워드 최종 입력",
-        acceptAnswers: ["나도힘들어", "나도 힘들어"],
-        next: "scene_d_puzzle_ok",
-        failNext: "ending_bad"
-    },
-    scene_d_puzzle_ok: {
-        type: "evidence",
-        speaker: "서윤",
-        title: "복원 완료 01:13~01:14",
-        text: "01:13 나: 나도 힘들어\n01:13 나: 오늘은 그냥 자\n01:14 지후: ...알겠어",
-        next: "scene_d_after_puzzle"
-    },
-    scene_d_after_puzzle: {
-        type: "state_update",
-        update: { suspicion: { me: 1 }, clue: "삭제 문장: 나도 힘들어" },
-        message: { speaker: "하나", text: "지후는 그 말 보고 끊은 거네." },
-        next: "scene_e_choice"
-    },
+function wait(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
-    scene_e_choice: {
-        type: "choice",
-        narration: "지후의 현재 상태를 어떻게 볼까?",
-        options: [
-            { label: "의식불명", next: "scene_e_coma" },
-            { label: "실종", next: "scene_e_missing" },
-            { label: "사망", next: "scene_e_dead" }
-        ]
-    },
-    scene_e_coma: {
-        type: "state_update",
-        update: {
-            flags: { e1: "coma" },
-            suspicion: { seoyun: 1 },
-            clue: "상태 추정: 의식불명"
-        },
-        message: { speaker: "서윤", text: "아직 늦지 않았다는 쪽으로 믿고 싶어." },
-        next: "scene_f_order"
-    },
-    scene_e_missing: {
-        type: "state_update",
-        update: {
-            flags: { e1: "missing" },
-            suspicion: { hana: 1 },
-            clue: "상태 추정: 실종"
-        },
-        message: { speaker: "하나", text: "없어졌다는 건 누군가가 덮었다는 뜻일 수도 있어." },
-        next: "scene_f_order"
-    },
-    scene_e_dead: {
-        type: "state_update",
-        update: {
-            flags: { e1: "dead" },
-            suspicion: { taemin: 1 },
-            clue: "상태 추정: 사망"
-        },
-        message: { speaker: "태민", text: "장례식 때도 우린 아무 말 못 했잖아." },
-        next: "scene_f_order"
-    },
-
-    scene_f_order: {
-        type: "evidence",
-        speaker: "서윤",
-        title: "복구 순서 로그",
-        text: "1) 지후 -> 나 개인톡\n2) 01:19~01:25 공백\n3) 통화 흔적(부재중 7회)",
-        next: "scene_f_react"
-    },
-    scene_f_react: {
-        type: "state_update",
-        update: { clue: "복구는 무작위가 아니라 의도 순서였다" },
-        message: { speaker: "태민", text: "처음부터 네 톡부터 깐 거면, 누가 널 겨냥한 거야." },
-        next: "scene_g_memo"
-    },
-    scene_g_memo: {
-        type: "evidence",
-        speaker: "하나",
-        title: "복구 메모",
-        text: "\"답하지 않은 사람은 결국 같은 편이 된다\"",
-        next: "scene_g_talk_1"
-    },
-    scene_g_talk_1: { speaker: "하나", text: "이 문장, 지후가 자주 하긴 했어.", next: "scene_g_talk_2" },
-    scene_g_talk_2: { speaker: "하나", text: "근데 지후 폰 메모 맞춤법이랑 달라.", next: "scene_g_update" },
-    scene_g_update: {
-        type: "state_update",
-        update: {
-            suspicion: { taemin: 1, hana: 1 },
-            clue: "지후 문장 모방 가능성"
-        },
-        message: { type: "system", text: "[정리] 지후 직접 복구 가능성 하락", subtype: "glitch" },
-        next: "scene_h_summary"
-    },
-    scene_h_summary: {
-        type: "system",
-        text: "[핵심 단서] 1) 읽음 4 2) 공백 6분 수동 삭제 3) 개인톡 우선 복구",
-        next: "scene_h_choice"
-    },
-    scene_h_choice: {
-        type: "choice",
-        narration: "누가 먼저 움직였다고 보나?",
-        options: [
-            { label: "서윤", next: "judge_seoyun" },
-            { label: "태민", next: "judge_taemin" },
-            { label: "하나", next: "judge_hana" },
-            { label: "나", next: "judge_me" }
-        ]
-    },
-    scene_h_retry: {
-        type: "choice",
-        narration: "오답이다. 1회 재지목 기회가 남아 있다.",
-        options: [
-            { label: "서윤", next: "judge_seoyun" },
-            { label: "태민", next: "judge_taemin" },
-            { label: "하나", next: "judge_hana" },
-            { label: "나", next: "judge_me" }
-        ]
-    },
-    judge_seoyun: { type: "accuse_result", target: "seoyun", successNext: "ending_confess", retryNext: "scene_h_retry", failNext: "ending_collusion" },
-    judge_taemin: { type: "accuse_result", target: "taemin", successNext: "ending_confess", retryNext: "scene_h_retry", failNext: "ending_collusion" },
-    judge_hana: { type: "accuse_result", target: "hana", successNext: "ending_confess", retryNext: "scene_h_retry", failNext: "ending_collusion" },
-    judge_me: { type: "accuse_result", target: "me", successNext: "ending_self", retryNext: "scene_h_retry", failNext: "ending_collusion" },
-
-    ending_confess: {
-        type: "ending_sequence",
-        sequence: [
-            { type: "system", text: "[시스템] 복구 작업자 특정 완료." },
-            { speaker: "태민", text: "그날을 묻으면 우리 다 괜찮은 척하게 되니까.", delay: 1200 },
-            { speaker: "서윤", text: "난 알림 보고도 침대에서 못 일어났어.", delay: 1000 },
-            { speaker: "하나", text: "난 누가 먼저 답하겠지 하고 기다렸고.", delay: 1000 },
-            { speaker: "태민", text: "난 책임질까 봐 대답을 미뤘어.", delay: 1000 },
-            { speaker: "ME", text: "난 '나도 힘들다'고 말하고 끝냈어.", delay: 1000 },
-            { type: "system", text: "[시스템] 복구 완료. 삭제 로그 보존." }
-        ],
-        ending: {
-            label: "고백 엔딩",
-            title: "같은 편",
-            desc: "침묵의 책임이 네 사람 모두에게 있었다는 사실이 남았다."
-        }
-    },
-    ending_collusion: {
-        type: "ending_sequence",
-        sequence: [
-            { type: "system", text: "[시스템] 지목 불일치. 재구성 실패.", subtype: "error" },
-            { speaker: "서윤", text: "또 서로 탓만 하네.", delay: 1200 },
-            { speaker: "하나", text: "시간 끝나간다.", delay: 1000 },
-            { type: "system", text: "[시스템] 보존 만료. 복구되지 않은 로그가 삭제되었습니다.", subtype: "error" },
-            { type: "system", text: "남은 건 읽음 4" }
-        ],
-        ending: {
-            label: "공모 엔딩",
-            title: "침묵 유지",
-            desc: "진실은 사라지고, 네 사람의 침묵만 같은 편으로 남았다."
-        }
-    },
-    ending_self: {
-        type: "ending_sequence",
-        sequence: [
-            { type: "system", text: "[시스템] 복구 작업자: ME" },
-            { speaker: "서윤", text: "뭐?", delay: 900 },
-            { speaker: "하나", text: "너가...?", delay: 900 },
-            { speaker: "태민", text: "왜 이제 와서?", delay: 900 },
-            { speaker: "ME", text: "그날을 그냥 지나가게 두면 아무 일도 아니게 될 것 같아서.", delay: 1200 },
-            { type: "system", text: "[기록] 진실보다 먼저 무너진 건 변명이었다." }
-        ],
-        ending: {
-            label: "자기지목 엔딩",
-            title: "다시 연 밤",
-            desc: "너는 복구 버튼을 눌렀고, 묻어둔 시간은 다시 열렸다."
-        }
-    },
-    ending_bad: {
-        type: "ending_sequence",
-        sequence: [
-            { type: "system", text: "[보존 만료] 복구 실패. 남은 데이터가 파기됩니다.", subtype: "error" },
-            { type: "system", text: "남은 건 읽음 4", subtype: "error" }
-        ],
-        ending: {
-            label: "배드엔딩",
-            title: "삭제됨",
-            desc: "핵심 문장을 끝내 복원하지 못했고, 진실은 보존시간과 함께 사라졌다."
-        }
-    }
-};
-
-const chatWindow = document.getElementById('chat-window');
-const interactionArea = document.getElementById('interaction-area');
-const headerCount = document.getElementById('header-count');
-const typingRow = document.getElementById('typing-row');
-const typingAvatar = document.getElementById('typing-avatar');
-const notifOverlay = document.getElementById('notification-overlay');
-const endingOverlay = document.getElementById('ending-overlay');
-const roomTitle = document.getElementById('room-title');
-const gameFrame = document.getElementById('game-frame');
-
-function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+function scrollToBottom() {
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+}
 
 function getTime() {
     currentTime.m += 1;
@@ -936,462 +605,342 @@ function getTime() {
     }
     if (currentTime.h >= 24) currentTime.h = 0;
     const h = currentTime.h;
-    const period = h < 12 ? '오전' : '오후';
+    const period = h < 12 ? "오전" : "오후";
     const displayH = h % 12 === 0 ? 12 : h % 12;
-    return `${period} ${displayH}:${String(currentTime.m).padStart(2, '0')}`;
+    return `${period} ${displayH}:${String(currentTime.m).padStart(2, "0")}`;
 }
 
-function scrollToBottom() {
-    chatWindow.scrollTop = chatWindow.scrollHeight;
+function normalizeAnswer(value) {
+    return String(value || "").toLowerCase().replace(/\s/g, "");
 }
 
-async function showTyping(speaker, duration) {
-    const char = CHARACTERS[speaker];
-    if (char) {
-        typingAvatar.className = `avatar ${char.avatarClass}`;
-        typingAvatar.innerHTML = `<img src="${char.avatarImg}" onerror="this.style.display='none'; this.parentElement.innerText='${char.avatarFallback}';">`;
-    }
-    typingRow.classList.add('visible');
-    scrollToBottom();
-    await wait(duration || TYPING_DELAY);
-    typingRow.classList.remove('visible');
+function isMeSpeaker(speaker) {
+    if (!speaker) return false;
+    const val = String(speaker).trim();
+    return /^(me|ME|나|내|플레이어)$/i.test(val);
+}
+
+function resolveCharacterKey(speaker) {
+    if (!speaker) return "UNKNOWN";
+    const s = String(speaker).trim();
+    if (isMeSpeaker(s)) return "ME";
+    if (s.includes("서윤") || /seoyun/i.test(s)) return "서윤";
+    if (s.includes("태민") || /taemin/i.test(s)) return "태민";
+    if (s.includes("하나") || /hana/i.test(s)) return "하나";
+    if (s.includes("지후") || /jihu/i.test(s)) return "지후";
+    return "UNKNOWN";
 }
 
 function createAvatar(speaker) {
-    const char = CHARACTERS[speaker];
-    if (!char) return null;
-    const avatar = document.createElement('div');
+    const key = resolveCharacterKey(speaker);
+    const char = CHARACTERS[key] || CHARACTERS.UNKNOWN;
+    const avatar = document.createElement("div");
     avatar.className = `avatar ${char.avatarClass}`;
     avatar.innerHTML = `<img src="${char.avatarImg}" onerror="this.style.display='none'; this.parentElement.innerText='${char.avatarFallback}';">`;
     return avatar;
 }
 
-let lastSpeaker = null;
-let lastSide = null;
+async function showTyping(speaker) {
+    const key = resolveCharacterKey(speaker);
+    const char = CHARACTERS[key] || CHARACTERS.UNKNOWN;
+    typingAvatar.className = `avatar ${char.avatarClass}`;
+    typingAvatar.innerHTML = `<img src="${char.avatarImg}" onerror="this.style.display='none'; this.parentElement.innerText='${char.avatarFallback}';">`;
+    typingRow.classList.add("visible");
+    scrollToBottom();
+    await wait(TYPING_DELAY);
+    typingRow.classList.remove("visible");
+}
 
-async function addMessage(data) {
-    const time = getTime();
+async function addSystemMessage(text, subtype) {
+    lastSpeaker = null;
+    const sysDiv = document.createElement("div");
+    sysDiv.className = "msg-system";
+    if (subtype === "error") sysDiv.classList.add("error");
+    if (subtype === "glitch") sysDiv.classList.add("glitch");
+    sysDiv.innerText = text;
+    chatWindow.insertBefore(sysDiv, typingRow);
+    scrollToBottom();
+    await wait(READING_DELAY);
+}
 
-    if (data.type === 'system' || data.type === 'date') {
-        lastSpeaker = null;
+async function addDateMessage(text) {
+    lastSpeaker = null;
+    const div = document.createElement("div");
+    div.className = "date-divider";
+    div.innerText = text;
+    chatWindow.insertBefore(div, typingRow);
+    scrollToBottom();
+    await wait(READING_DELAY);
+}
 
-        if (data.type === 'date') {
-            const div = document.createElement('div');
-            div.className = 'date-divider';
-            div.innerText = data.text;
-            chatWindow.insertBefore(div, typingRow);
-        } else {
-            const sysDiv = document.createElement('div');
-            sysDiv.className = 'msg-system';
-            if (data.subtype === 'error') sysDiv.classList.add('error');
-            if (data.subtype === 'glitch') sysDiv.classList.add('glitch');
-            sysDiv.innerText = data.text;
-            chatWindow.insertBefore(sysDiv, typingRow);
-        }
+async function addChatMessage(node) {
+    const speaker = node.speaker || "UNKNOWN";
+    const isMe = isMeSpeaker(speaker);
+    const side = isMe ? "right" : "left";
+    const channel = node.channel || null;
 
-        scrollToBottom();
-
-        if (data.effect === 'shake') {
-            gameFrame.classList.add('shake');
-            setTimeout(() => gameFrame.classList.remove('shake'), 500);
-        }
-
-        await wait(READING_DELAY);
-        return;
+    if (channel && channel !== lastChannel) {
+        const label = channel === "past" ? "[과거 로그]" : channel === "now" ? "[현재 채팅]" : `[${channel}]`;
+        await addSystemMessage(label, channel === "past" ? "glitch" : null);
+        lastChannel = channel;
     }
 
-    if (data.type === 'deleted') {
-        lastSpeaker = null;
-        const row = document.createElement('div');
-        row.className = 'msg-row msg-row-left';
-        const avatar = createAvatar(data.speaker);
-        const content = document.createElement('div');
-        content.className = 'msg-content';
-        content.innerHTML = `
-            <span class="sender-name">${data.speaker}</span>
-            <div class="msg-bubble bubble-left msg-deleted">[이 메시지는 삭제되었습니다.]</div>
-        `;
-        if (avatar) row.appendChild(avatar);
-        row.appendChild(content);
-        chatWindow.insertBefore(row, typingRow);
-        scrollToBottom();
-        await wait(READING_DELAY);
-        return;
+    const sameAsBefore = lastSpeaker === speaker && lastSide === side;
+
+    if (!isMe) {
+        await showTyping(speaker);
     }
 
-    if (data.type === 'evidence') {
-        lastSpeaker = null;
-        const isMe = data.speaker === 'ME';
-        const side = isMe ? 'right' : 'left';
-
-        if (!isMe) {
-            await showTyping(data.speaker, data.speedOverride || TYPING_DELAY);
-        }
-
-        const row = document.createElement('div');
-        row.className = `msg-row msg-row-${side}`;
-
-        if (!isMe) {
-            const avatar = createAvatar(data.speaker);
-            if (avatar) row.appendChild(avatar);
-        }
-
-        const content = document.createElement('div');
-        content.className = 'msg-content';
-        content.innerHTML = `
-            ${!isMe ? `<span class="sender-name">${data.speaker}</span>` : ''}
-            <div class="msg-bubble bubble-${side}">
-                <div class="evidence-box">
-                    <div class="evidence-title">${data.title}</div>
-                    <div class="evidence-desc">${data.text}</div>
-                </div>
-            </div>
-            <span class="msg-time">${time}</span>
-        `;
-
-        row.appendChild(content);
-        chatWindow.insertBefore(row, typingRow);
-        scrollToBottom();
-        await wait(READING_DELAY + 400);
-        return;
-    }
-
-    const isMe = data.speaker === 'ME' || (data.speaker && data.speaker.includes('ME'));
-    const side = isMe ? 'right' : 'left';
-    const sameAsBefore = (lastSpeaker === data.speaker && lastSide === side);
-
-    if (!isMe && data.speaker) {
-        await showTyping(data.speaker, data.speedOverride || TYPING_DELAY);
-    }
-
-    const row = document.createElement('div');
+    const row = document.createElement("div");
     row.className = `msg-row msg-row-${side}`;
 
     if (!isMe) {
         if (!sameAsBefore) {
-            const avatar = createAvatar(data.speaker);
-            if (avatar) row.appendChild(avatar);
+            row.appendChild(createAvatar(speaker));
         } else {
-            const spacer = document.createElement('div');
-            spacer.style.width = '36px';
-            spacer.style.minWidth = '36px';
+            const spacer = document.createElement("div");
+            spacer.style.width = "36px";
+            spacer.style.minWidth = "36px";
             row.appendChild(spacer);
         }
     }
 
-    const content = document.createElement('div');
-    content.className = 'msg-content';
-    content.innerHTML = `
-        ${(!isMe && !sameAsBefore) ? `<span class="sender-name">${data.speaker}</span>` : ''}
-        <div class="msg-bubble bubble-${side}">${data.text}</div>
-        <span class="msg-time">${time}</span>
-    `;
+    const content = document.createElement("div");
+    content.className = "msg-content";
+    const senderName = !isMe && !sameAsBefore ? `<span class="sender-name">${speaker}</span>` : "";
+    content.innerHTML = `${senderName}<div class="msg-bubble bubble-${side}">${node.text || ""}</div><span class="msg-time">${getTime()}</span>`;
 
     row.appendChild(content);
     chatWindow.insertBefore(row, typingRow);
     scrollToBottom();
 
-    lastSpeaker = data.speaker;
+    lastSpeaker = speaker;
     lastSide = side;
-
     await wait(READING_DELAY);
 }
 
-async function playPrologue(data) {
-    notifOverlay.innerHTML = '';
-    notifOverlay.style.display = 'flex';
+async function playEndingSequence(node) {
+    interactionArea.innerHTML = "";
+    const sequence = Array.isArray(node.sequence) ? node.sequence : [];
 
-    for (const notif of data.notifications) {
-        await wait(notif.delay || 1200);
-
-        const card = document.createElement('div');
-        card.className = 'notif-card';
-
-        card.innerHTML = `
-            <div class="notif-header">
-                <div class="notif-app-icon">알림</div>
-                <span class="notif-app-name">메신저</span>
-                <span class="notif-time">지금</span>
-            </div>
-            <div class="notif-sender">${notif.sender}</div>
-            <div class="notif-text">${notif.text}</div>
-        `;
-
-        notifOverlay.appendChild(card);
-        requestAnimationFrame(() => card.classList.add('visible'));
-
-        if (notif.isInvite) {
-            await wait(1800);
-            card.style.cursor = 'pointer';
-            card.style.border = '1px solid #555';
-
-            await new Promise(resolve => {
-                card.onclick = () => {
-                    notifOverlay.style.transition = 'opacity 0.4s';
-                    notifOverlay.style.opacity = '0';
-                    setTimeout(() => {
-                        notifOverlay.style.display = 'none';
-                        resolve();
-                    }, 400);
-                };
-                setTimeout(() => {
-                    notifOverlay.style.transition = 'opacity 0.4s';
-                    notifOverlay.style.opacity = '0';
-                    setTimeout(() => {
-                        notifOverlay.style.display = 'none';
-                        resolve();
-                    }, 400);
-                }, 4500);
-            });
-        }
-    }
-}
-
-function applyUpdate(update) {
-    if (!update) return;
-    if (update.flags) Object.assign(gameState, update.flags);
-    if (update.suspicion) {
-        Object.keys(update.suspicion).forEach((key) => {
-            gameState.suspicion[key] = (gameState.suspicion[key] || 0) + update.suspicion[key];
-        });
-    }
-    if (update.clue && !gameState.clues.includes(update.clue)) {
-        gameState.clues.push(update.clue);
-    }
-}
-
-function normalizeAnswer(value) {
-    return value.toLowerCase().replace(/\s/g, '');
-}
-
-function determineCulprit() {
-    const priorities = ['taemin', 'hana', 'seoyun', 'me'];
-    let winner = priorities[0];
-    let score = Number.MIN_SAFE_INTEGER;
-
-    priorities.forEach((name) => {
-        const value = gameState.suspicion[name] || 0;
-        if (value > score) {
-            score = value;
-            winner = name;
-        }
-    });
-
-    return winner;
-}
-
-function updateHeaderTimer() {
-    const mm = String(Math.floor(retentionSeconds / 60)).padStart(2, '0');
-    const ss = String(retentionSeconds % 60).padStart(2, '0');
-    headerCount.innerText = `보존 ${mm}:${ss}`;
-    if (retentionSeconds <= 120) {
-        headerCount.classList.add('alert');
-    }
-}
-
-function startRetentionTimer() {
-    if (timerStarted) return;
-    timerStarted = true;
-    updateHeaderTimer();
-
-    setInterval(() => {
-        if (gameEnded) return;
-        retentionSeconds = Math.max(0, retentionSeconds - 1);
-        updateHeaderTimer();
-        if (retentionSeconds === 0 && !gameEnded) {
-            playScene('ending_bad');
-        }
-    }, 1000);
-}
-
-async function playEndingSequence(data) {
-    interactionArea.innerHTML = '';
-
-    for (const step of data.sequence) {
+    for (const step of sequence) {
         if (step.delay) await wait(step.delay);
-
-        if (step.type === 'system') {
-            await addMessage({ type: 'system', text: step.text, subtype: step.subtype });
-        } else if (step.type === 'spam') {
-            for (const t of step.texts) {
-                await wait(step.delay || 200);
-                const sysDiv = document.createElement('div');
-                sysDiv.className = 'msg-system';
-                sysDiv.innerText = t;
-                sysDiv.style.borderColor = '#5a2a2a';
-                sysDiv.style.color = '#cc4444';
-                chatWindow.insertBefore(sysDiv, typingRow);
-                scrollToBottom();
-            }
-        } else if (step.speaker) {
-            await addMessage({ speaker: step.speaker, text: step.text });
+        if (step.type === "system") {
+            await addSystemMessage(step.text || "", step.subtype);
+        } else {
+            await addChatMessage(step);
         }
     }
 
-    await wait(1500);
-    showEnding(data.ending);
+    if (node.ending) {
+        showEnding(node.ending);
+    }
 }
 
 function showEnding(ending) {
-    gameEnded = true;
-    endingOverlay.style.display = 'flex';
-    endingOverlay.style.opacity = '0';
-    document.getElementById('ending-title').innerText = ending.title;
-    document.getElementById('ending-desc').innerText = ending.desc;
-    endingOverlay.querySelector('.ending-label').innerText = ending.label;
-
+    ended = true;
+    endingOverlay.style.display = "flex";
+    endingOverlay.style.opacity = "0";
+    endingOverlay.querySelector(".ending-label").innerText = ending.label || "엔딩";
+    document.getElementById("ending-title").innerText = ending.title || "";
+    document.getElementById("ending-desc").innerText = ending.desc || "";
     requestAnimationFrame(() => {
-        endingOverlay.style.transition = 'opacity 1.2s';
-        endingOverlay.style.opacity = '1';
+        endingOverlay.style.transition = "opacity 1.2s";
+        endingOverlay.style.opacity = "1";
     });
 }
 
-async function playScene(sceneId) {
-    currentSceneId = sceneId;
-    const data = scenario[sceneId];
-    if (!data || gameEnded) return;
+function gatherReferences(scenario) {
+    const refs = [];
+    for (const [id, node] of Object.entries(scenario)) {
+        if (id === "start") continue;
+        if (node.next) refs.push({ from: id, to: node.next, kind: "next" });
+        if (node.failNext) refs.push({ from: id, to: node.failNext, kind: "failNext" });
+        if (node.type === "choice" && Array.isArray(node.options)) {
+            node.options.forEach((opt, i) => {
+                if (opt && opt.next) refs.push({ from: id, to: opt.next, kind: `choice[${i}]` });
+            });
+        }
+    }
+    return refs;
+}
 
-    if (data.type === 'notification') {
-        await playPrologue(data);
-        if (data.next) playScene(data.next);
-        return;
+function validateScenario(scenario) {
+    const errors = [];
+    if (!scenario || typeof scenario !== "object") {
+        errors.push("scenario.json root must be an object");
+        return errors;
+    }
+    if (!scenario.start || !scenario[scenario.start]) {
+        errors.push("missing or invalid 'start' node");
     }
 
-    if (data.type === 'ending_sequence') {
-        await playEndingSequence(data);
-        return;
+    const refs = gatherReferences(scenario);
+    for (const ref of refs) {
+        if (!scenario[ref.to]) {
+            errors.push(`broken reference: ${ref.from} -> ${ref.to} (${ref.kind})`);
+        }
     }
 
-    if (data.type === 'system' || data.type === 'date' || data.type === 'deleted' || data.type === 'evidence') {
-        await addMessage(data);
-        if (data.next) playScene(data.next);
-        return;
-    }
-
-    if (data.type === 'state_update') {
-        applyUpdate(data.update);
-        if (data.message) await addMessage(data.message);
-        if (data.next) playScene(data.next);
-        return;
-    }
-
-    if (data.type === 'accuse_result') {
-        const culprit = determineCulprit();
-        if (data.target === culprit) {
-            await addMessage({ type: 'system', text: `[판정] 지목 적중: ${culprit.toUpperCase()}` });
-            playScene(data.successNext);
-            return;
+    if (scenario.start && scenario[scenario.start]) {
+        const visited = new Set();
+        const queue = [scenario.start];
+        while (queue.length > 0) {
+            const id = queue.shift();
+            if (visited.has(id)) continue;
+            visited.add(id);
+            const node = scenario[id];
+            if (!node) continue;
+            if (node.next) queue.push(node.next);
+            if (node.failNext) queue.push(node.failNext);
+            if (node.type === "choice" && Array.isArray(node.options)) {
+                node.options.forEach((opt) => {
+                    if (opt && opt.next) queue.push(opt.next);
+                });
+            }
         }
 
-        gameState.accuseAttempts += 1;
-        await addMessage({ type: 'system', text: '[판정] 지목 불일치', subtype: 'error' });
+        Object.keys(scenario).forEach((id) => {
+            if (id === "start") return;
+            if (!visited.has(id)) {
+                errors.push(`unreachable node: ${id}`);
+            }
+        });
+    }
 
-        if (gameState.accuseAttempts < 2) {
-            playScene(data.retryNext);
-        } else {
-            playScene(data.failNext);
-        }
+    return errors;
+}
+
+function showLoadError(lines) {
+    const msg = Array.isArray(lines) ? lines.join("\n") : String(lines || "unknown error");
+    addSystemMessage(`[시나리오 로드 실패]\n${msg}`, "error");
+    interactionArea.innerHTML = "";
+    const retry = document.createElement("button");
+    retry.className = "btn-choice";
+    retry.innerText = "다시 시도";
+    retry.onclick = () => location.reload();
+    interactionArea.appendChild(retry);
+}
+
+async function playNode(nodeId) {
+    if (ended) return;
+    currentNodeId = nodeId;
+    const node = scenarioData[nodeId];
+    if (!node) {
+        await addSystemMessage(`[오류] 존재하지 않는 노드: ${nodeId}`, "error");
         return;
     }
 
-    if (data.type === 'choice') {
-        if (data.narration) {
-            const narr = document.createElement('div');
-            narr.className = 'msg-system';
-            narr.style.fontStyle = 'italic';
-            narr.style.border = 'none';
-            narr.style.color = '#666';
-            narr.innerText = data.narration;
-            chatWindow.insertBefore(narr, typingRow);
-            scrollToBottom();
+    if (node.type === "system") {
+        await addSystemMessage(node.text || "", node.subtype);
+        if (node.next) return playNode(node.next);
+        return;
+    }
+
+    if (node.type === "date") {
+        await addDateMessage(node.text || "");
+        if (node.next) return playNode(node.next);
+        return;
+    }
+
+    if (node.type === "ending_sequence") {
+        await playEndingSequence(node);
+        return;
+    }
+
+    if (node.type === "choice") {
+        if (node.narration) {
+            await addSystemMessage(node.narration);
         }
-
-        await wait(450);
-        interactionArea.innerHTML = '';
-
-        data.options.forEach(opt => {
-            const btn = document.createElement('button');
-            btn.className = 'btn-choice';
-            btn.innerText = opt.label;
+        interactionArea.innerHTML = "";
+        (node.options || []).forEach((opt) => {
+            const btn = document.createElement("button");
+            btn.className = "btn-choice";
+            btn.innerText = opt.label || "선택";
             btn.onclick = async () => {
-                interactionArea.innerHTML = '';
-                await addMessage({ speaker: 'ME', text: opt.label });
-                playScene(opt.next);
+                interactionArea.innerHTML = "";
+                await addChatMessage({ speaker: "ME", text: opt.label || "선택" });
+                if (opt.next) playNode(opt.next);
             };
             interactionArea.appendChild(btn);
         });
         return;
     }
 
-    if (data.type === 'input') {
-        interactionArea.innerHTML = '';
-        const inputGroup = document.createElement('div');
-        inputGroup.className = 'input-group';
-        inputGroup.innerHTML = `
-            <input type="text" id="answer-input" placeholder="${data.placeholder || '정답을 입력하세요...'}" autocomplete="off">
-            <button id="submit-btn">전송</button>
-        `;
+    if (node.type === "input") {
+        interactionArea.innerHTML = "";
+        const inputGroup = document.createElement("div");
+        inputGroup.className = "input-group";
+        inputGroup.innerHTML = `<input type="text" id="answer-input" placeholder="${node.placeholder || INPUT_PLACEHOLDER}" autocomplete="off"><button id="submit-btn">전송</button>`;
         interactionArea.appendChild(inputGroup);
 
-        const input = inputGroup.querySelector('#answer-input');
-        const btn = inputGroup.querySelector('#submit-btn');
+        const input = inputGroup.querySelector("#answer-input");
+        const button = inputGroup.querySelector("#submit-btn");
         input.focus();
 
-        const checkAnswer = async () => {
-            const val = input.value.trim();
+        const submit = async () => {
+            const val = (input.value || "").trim();
             if (!val) return;
+            interactionArea.innerHTML = "";
+            await addChatMessage({ speaker: "ME", text: val });
 
-            interactionArea.innerHTML = '';
-            await addMessage({ speaker: 'ME', text: val });
-
-            const normalized = normalizeAnswer(val);
-            const acceptAnswers = (data.acceptAnswers || [data.correctAnswer || ''])
-                .map((v) => normalizeAnswer(v));
-
-            if (acceptAnswers.includes(normalized)) {
-                playScene(data.next);
-            } else {
-                playScene(data.failNext);
-            }
+            const isCorrect = normalizeAnswer(val) === normalizeAnswer(node.correctAnswer);
+            const target = isCorrect ? node.next : node.failNext;
+            if (target) playNode(target);
         };
 
-        btn.onclick = checkAnswer;
-        input.onkeypress = (e) => { if (e.key === 'Enter') checkAnswer(); };
+        button.onclick = submit;
+        input.onkeypress = (e) => {
+            if (e.key === "Enter") submit();
+        };
         return;
     }
 
-    if (data.speaker) {
-        await addMessage(data);
-        if (data.next) playScene(data.next);
-    }
+    await addChatMessage(node);
+    if (node.next) return playNode(node.next);
 }
 
 window.render_game_to_text = () => {
-    const pending = Array.from(interactionArea.querySelectorAll('.btn-choice')).map((btn) => btn.innerText);
+    const choices = Array.from(interactionArea.querySelectorAll(".btn-choice")).map((btn) => btn.innerText);
     return JSON.stringify({
-        scene: currentSceneId,
-        retentionSeconds,
-        clues: gameState.clues,
-        suspicion: gameState.suspicion,
-        accuseAttempts: gameState.accuseAttempts,
-        pendingChoices: pending
+        scene: currentNodeId,
+        ended,
+        pendingChoices: choices,
+        coordinateSystem: "chat_ui_top_to_bottom"
     });
 };
 
-window.advanceTime = (ms) => {
-    const seconds = Math.max(0, Math.floor(ms / 1000));
-    if (!gameEnded && seconds > 0) {
-        retentionSeconds = Math.max(0, retentionSeconds - seconds);
-        updateHeaderTimer();
-    }
+window.advanceTime = () => {
+    // deterministic hook for external test runner
 };
 
-window.onload = () => {
-    roomTitle.innerText = '404호 답하지 않은 밤';
-    startRetentionTimer();
-    playScene('prologue_alarm');
-};
+async function bootstrap() {
+    roomTitle.innerText = "404호 단체 채팅방";
+    headerCount.innerText = "참여자 4명";
+    notifOverlay.style.display = "none";
+
+    try {
+        const response = await fetch("./scenario.json", { cache: "no-store" });
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        const parsed = await response.json();
+        const errors = validateScenario(parsed);
+        if (errors.length > 0) {
+            throw new Error(errors.slice(0, 8).join("\n"));
+        }
+
+        scenarioData = parsed;
+        playNode(scenarioData.start);
+    } catch (error) {
+        showLoadError(error.message || String(error));
+    }
+}
+
+window.onload = bootstrap;
 </script>
 </body>
 </html>
+
 

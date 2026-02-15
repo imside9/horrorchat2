@@ -1,0 +1,231 @@
+{
+  "start": "p0_system_restore",
+
+  "p0_system_restore": {
+    "type": "system",
+    "text": "404호 단체 채팅방이 복원되었습니다.",
+    "next": "p0_system_logs"
+  },
+
+  "p0_system_logs": {
+    "type": "system",
+    "text": "삭제 로그 23개가 복구되었습니다. 보존 만료 18분",
+    "next": "p1_past_intro"
+  },
+
+  "p1_past_intro": {
+    "type": "date",
+    "text": "📅 3일 전",
+    "next": "p1_past_1"
+  },
+
+  "p1_past_1": {
+    "channel": "past",
+    "speaker": "지후",
+    "text": "너 지금 어디야?",
+    "next": "p1_past_2"
+  },
+
+  "p1_past_2": {
+    "channel": "past",
+    "speaker": "지후",
+    "text": "나 약 잘못 먹은 것 같아",
+    "next": "p1_past_3"
+  },
+
+  "p1_past_3": {
+    "channel": "past",
+    "speaker": "지후",
+    "text": "숨이 좀 이상해",
+    "next": "p1_past_4"
+  },
+
+  "p1_past_4": {
+    "type": "system",
+    "text": "(읽음 4)",
+    "next": "p1_now_1"
+  },
+
+  "p1_now_1": {
+    "channel": "now",
+    "speaker": "태민",
+    "text": "...야 이거 뭐냐",
+    "next": "p1_now_2"
+  },
+
+  "p1_now_2": {
+    "channel": "now",
+    "speaker": "서윤",
+    "text": "누가 복구했어?",
+    "next": "p1_now_3"
+  },
+
+  "p1_now_3": {
+    "channel": "now",
+    "speaker": "하나",
+    "text": "나 아님",
+    "next": "p2_private_restore"
+  },
+
+  "p2_private_restore": {
+    "type": "system",
+    "text": "삭제된 개인 메시지 1건이 복구되었습니다.",
+    "next": "p2_past_private"
+  },
+
+  "p2_past_private": {
+    "channel": "past",
+    "speaker": "지후 → 나",
+    "text": "너만이라도 좀...",
+    "next": "p2_deleted"
+  },
+
+  "p2_deleted": {
+    "channel": "past",
+    "speaker": "나",
+    "text": "[삭제됨]",
+    "next": "p2_now_pressure"
+  },
+
+  "p2_now_pressure": {
+    "channel": "now",
+    "speaker": "서윤",
+    "text": "너 그때 뭐라고 했어?",
+    "next": "choice_defense"
+  },
+
+  "choice_defense": {
+    "type": "choice",
+    "options": [
+      { "label": "기억 잘 안 나", "next": "p3_gap" },
+      { "label": "겁나서 못 했어", "next": "p3_gap" },
+      { "label": "나 몰아가려고 복구한 거 아냐?", "next": "p3_gap" }
+    ]
+  },
+
+  "p3_gap": {
+    "type": "system",
+    "text": "📅 3일 전 01:19~01:25 로그 누락 (6분)",
+    "next": "puzzle_restore"
+  },
+
+  "puzzle_restore": {
+    "type": "input",
+    "placeholder": "삭제된 문장을 복원하세요",
+    "correctAnswer": "나도 힘들어",
+    "next": "puzzle_success",
+    "failNext": "bad_end"
+  },
+
+  "puzzle_success": {
+    "channel": "past",
+    "speaker": "나",
+    "text": "나도 힘들어",
+    "next": "puzzle_success_2"
+  },
+
+  "puzzle_success_2": {
+    "channel": "past",
+    "speaker": "지후",
+    "text": "...알겠어",
+    "next": "p4_branch_state"
+  },
+
+  "p4_branch_state": {
+    "type": "choice",
+    "narration": "그날 이후 지후의 상태는?",
+    "options": [
+      { "label": "의식불명", "next": "p5_restore_trace" },
+      { "label": "실종", "next": "p5_restore_trace" },
+      { "label": "사망", "next": "p5_restore_trace" }
+    ]
+  },
+
+  "p5_restore_trace": {
+    "type": "system",
+    "text": "복구 순서: 1) 개인톡 2) 공백구간 3) 통화 흔적",
+    "next": "p5_now_discuss"
+  },
+
+  "p5_now_discuss": {
+    "channel": "now",
+    "speaker": "서윤",
+    "text": "처음부터 너 톡부터 꺼냈네",
+    "next": "final_choice"
+  },
+
+  "final_choice": {
+    "type": "choice",
+    "narration": "누가 복구했을까?",
+    "options": [
+      { "label": "지후", "next": "ending_jihu" },
+      { "label": "서윤", "next": "ending_seoyun" },
+      { "label": "태민", "next": "ending_taemin" },
+      { "label": "나", "next": "ending_me" }
+    ]
+  },
+
+  "ending_jihu": {
+    "type": "ending_sequence",
+    "sequence": [
+      { "type": "system", "text": "복구 작업자: 지후 (예약 복구)" },
+      { "speaker": "하나", "text": "지후가 우리를 다시 모은 거야?" }
+    ],
+    "ending": {
+      "label": "시험 엔딩",
+      "title": "답을 기다린 사람",
+      "desc": "지후는 우리가 답할지 확인하려고 방을 다시 열었다."
+    }
+  },
+
+  "ending_seoyun": {
+    "type": "ending_sequence",
+    "sequence": [
+      { "type": "system", "text": "복구 작업자: 서윤" },
+      { "speaker": "서윤", "text": "누가 거짓말하는지 보고 싶었어." }
+    ],
+    "ending": {
+      "label": "기록 엔딩",
+      "title": "복구한 사람",
+      "desc": "서윤은 진실을 위해 기록을 열었다."
+    }
+  },
+
+  "ending_taemin": {
+    "type": "ending_sequence",
+    "sequence": [
+      { "type": "system", "text": "복구 작업자: 태민" },
+      { "speaker": "태민", "text": "살려고 그랬어." }
+    ],
+    "ending": {
+      "label": "전가 엔딩",
+      "title": "밀어낸 책임",
+      "desc": "태민은 자신을 지키기 위해 복구를 이용했다."
+    }
+  },
+
+  "ending_me": {
+    "type": "ending_sequence",
+    "sequence": [
+      { "type": "system", "text": "복구 작업자: 나" },
+      { "speaker": "나", "text": "그날을 그냥 없던 일로 만들고 싶지 않았어." }
+    ],
+    "ending": {
+      "label": "자기기만 엔딩",
+      "title": "내가 연 방",
+      "desc": "복구는 자백이자 방어였다."
+    }
+  },
+
+  "bad_end": {
+    "type": "ending_sequence",
+    "sequence": [
+      { "type": "system", "text": "보존 만료. 복구되지 않은 로그 삭제." }
+    ],
+    "ending": {
+      "label": "소거 엔딩",
+      "title": "읽음 4",
+      "desc": "문장은 사라지고 책임만 남았다."
+    }
+  }
+}

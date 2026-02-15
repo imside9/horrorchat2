@@ -45,3 +45,13 @@ Original prompt: horrochat 폴더에 있는 채팅 게임 프로젝트의 ui를 
 - Added retention timer UI update (header-count as mm:ss) and timeout fail path.
 - Added window hooks for test tooling: render_game_to_text and advanceTime.
 - Fixed avatar path typo for �¹� profile image.
+
+## Update 2026-02-15 (scenario.json single-source implementation)
+- Replaced inline const scenario runtime with external etch('./scenario.json') loading flow.
+- Added scenario integrity checks in runtime: missing start, broken node references (
+ext/failNext/choice.next), and unreachable-node detection.
+- Simplified scene engine to scenario.json-supported node types: system, date, message (speaker/text), choice, input, ending_sequence.
+- Enforced profile-only media policy: message rendering now uses profile avatars only, with no image/audio evidence path usage.
+- Preserved test hooks: window.render_game_to_text, window.advanceTime.
+- Fixed malformed header/ending HTML tags that caused visible UI corruption (??/span>).
+- Validation complete: JS syntax check PASS, scenario reference check PASS (31 refs / 0 broken), Playwright smoke run PASS (state-2 scene p1_past_2, screenshot verified).
