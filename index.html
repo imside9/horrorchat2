@@ -336,33 +336,6 @@
         .btn-choice:hover { background: #252525; color: white; border-color: #555; }
         .btn-choice:active { transform: scale(0.98); }
 
-        .input-group { display: flex; gap: 8px; }
-        #answer-input {
-            flex: 1;
-            background: #1a1a1a;
-            border: 1px solid #444;
-            color: #fff;
-            padding: 12px 14px;
-            border-radius: 20px;
-            font-family: var(--font);
-            font-size: 0.9rem;
-            outline: none;
-        }
-        #answer-input:focus { border-color: #666; }
-        #answer-input::placeholder { color: #555; }
-        #submit-btn {
-            background: #333;
-            color: white;
-            border: none;
-            padding: 0 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-family: var(--font);
-            font-size: 0.85rem;
-            transition: 0.2s;
-        }
-        #submit-btn:hover { background: var(--accent); }
-
         /* === NOTIFICATION OVERLAY (Prologue) === */
         #notification-overlay {
             position: absolute;
@@ -561,7 +534,6 @@
 // scenario.json single-source runtime
 const READING_DELAY = 550;
 const TYPING_DELAY = 700;
-const INPUT_PLACEHOLDER = "정답을 입력하세요...";
 
 const CHARACTERS = {
     "서윤": { avatarClass: "avatar-jisu", avatarImg: "./images/profile_jisu.png", avatarFallback: "SY" },
@@ -608,10 +580,6 @@ function getTime() {
     const period = h < 12 ? "오전" : "오후";
     const displayH = h % 12 === 0 ? 12 : h % 12;
     return `${period} ${displayH}:${String(currentTime.m).padStart(2, "0")}`;
-}
-
-function normalizeAnswer(value) {
-    return String(value || "").toLowerCase().replace(/\s/g, "");
 }
 
 function isMeSpeaker(speaker) {
@@ -864,35 +832,6 @@ async function playNode(nodeId) {
             };
             interactionArea.appendChild(btn);
         });
-        return;
-    }
-
-    if (node.type === "input") {
-        interactionArea.innerHTML = "";
-        const inputGroup = document.createElement("div");
-        inputGroup.className = "input-group";
-        inputGroup.innerHTML = `<input type="text" id="answer-input" placeholder="${node.placeholder || INPUT_PLACEHOLDER}" autocomplete="off"><button id="submit-btn">전송</button>`;
-        interactionArea.appendChild(inputGroup);
-
-        const input = inputGroup.querySelector("#answer-input");
-        const button = inputGroup.querySelector("#submit-btn");
-        input.focus();
-
-        const submit = async () => {
-            const val = (input.value || "").trim();
-            if (!val) return;
-            interactionArea.innerHTML = "";
-            await addChatMessage({ speaker: "ME", text: val });
-
-            const isCorrect = normalizeAnswer(val) === normalizeAnswer(node.correctAnswer);
-            const target = isCorrect ? node.next : node.failNext;
-            if (target) playNode(target);
-        };
-
-        button.onclick = submit;
-        input.onkeypress = (e) => {
-            if (e.key === "Enter") submit();
-        };
         return;
     }
 

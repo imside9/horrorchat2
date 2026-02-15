@@ -110,11 +110,13 @@
   },
 
   "puzzle_restore": {
-    "type": "input",
-    "placeholder": "삭제된 문장을 복원하세요",
-    "correctAnswer": "나도 힘들어",
-    "next": "puzzle_success",
-    "failNext": "bad_end"
+    "type": "choice",
+    "narration": "삭제된 문장을 복원하세요",
+    "options": [
+      { "label": "나도 힘들어", "next": "puzzle_success" },
+      { "label": "괜찮아질 거야", "next": "bad_end" },
+      { "label": "내일 이야기하자", "next": "bad_end" }
+    ]
   },
 
   "puzzle_success": {
