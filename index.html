@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Room 404: Edit War</title>
+    <title>404호: 수정 전쟁</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
 
@@ -525,7 +525,7 @@
 
     <!-- ENDING OVERLAY -->
     <div id="ending-overlay">
-        <div class="ending-label">ENDING</div>
+        <div class="ending-label">엔딩</div>
         <div class="ending-title" id="ending-title"></div>
         <div class="ending-desc" id="ending-desc"></div>
         <button class="ending-restart" onclick="location.reload()">다시 플레이</button>
@@ -534,8 +534,8 @@
     <header>
         <span class="header-back">←</span>
         <div class="header-info">
-            <div class="room-title" id="room-title">Room 404 Coordination</div>
-            <div class="user-count" id="header-count">4 participants</div>
+            <div class="room-title" id="room-title">404호 조정 채팅방</div>
+            <div class="user-count" id="header-count">참여자 4명</div>
         </div>
         <div class="header-icons">
             <span>⋯</span>
@@ -571,25 +571,25 @@ let currentTime = { h: 23, m: 47 };
 
 // === CHARACTER DATA ===
 const CHARACTERS = {
-    'Seoyun': {
+    '서윤': {
         avatarClass: 'avatar-jisu',
         avatarImg: './images/profile_jisu.png',
         avatarFallback: 'SY',
         color: '#aa66cc'
     },
-    'Taemin': {
+    '태민': {
         avatarClass: 'avatar-younghun',
         avatarImg: './images/profile_younghun.png',
         avatarFallback: 'TM',
         color: '#5588cc'
     },
-    'Hana': {
+    '하나': {
         avatarClass: 'avatar-jisu',
         avatarImg: './images/profile_jisu.png',
         avatarFallback: 'HN',
         color: '#c48f5a'
     },
-    'Unknown User': {
+    '알 수 없는 사용자': {
         avatarClass: 'avatar-unknown',
         avatarImg: './images/profile_unknown.png',
         avatarFallback: '?',
@@ -602,219 +602,219 @@ const scenario = {
     "prologue_retention_notice": {
         type: "notification",
         notifications: [
-            { delay: 1000, sender: "System", text: "Room log retention expires in 20 minutes." },
-            { delay: 1800, sender: "Hana", text: "If we do this, we do it now. No media, logs only." },
-            { delay: 2400, sender: "Messenger", text: "You were invited to 'Room 404 Coordination'.", isInvite: true }
+            { delay: 1000, sender: "시스템", text: "채팅방 로그 보존 시간이 20분 후 만료됩니다." },
+            { delay: 1800, sender: "하나", text: "이번엔 지금 바로 끝내자. 영상 말고 로그로만 간다." },
+            { delay: 2400, sender: "메신저", text: "'404호 조정 채팅방'에 초대되었습니다.", isInvite: true }
         ],
         next: "start_invite"
     },
     "start_invite": {
         type: "system",
-        text: "[System] Temporary investigation room created. Participants synced.",
+        text: "[시스템] 임시 조사 채팅방이 생성되었습니다. 참여자 동기화 완료.",
         next: "date_divider"
     },
     "date_divider": {
         type: "date",
-        text: "Sunday, February 15, 2026",
+        text: "2026년 2월 15일 일요일",
         next: "act1_accuse_open"
     },
     "act1_accuse_open": {
-        speaker: "Seoyun",
-        text: "No detours. Taemin was last on-site. Start there.",
+        speaker: "서윤",
+        text: "돌려 말하지 말자. 마지막 현장 인원은 태민이야. 거기부터 시작해.",
         next: "act1_choice"
     },
     "act1_choice": {
         type: "choice",
-        narration: "Push suspect now, or hold the room and inspect logs first.",
+        narration: "지금 바로 추궁할까, 아니면 로그부터 확인할까?",
         options: [
-            { label: "Taemin, explain your timeline first.", next: "act1_press_taemin" },
-            { label: "No blame yet. Start with lock logs.", next: "act1_hold_room" }
+            { label: "태민, 네 타임라인부터 설명해.", next: "act1_press_taemin" },
+            { label: "성급한 단정은 말고, 도어락 로그부터 보자.", next: "act1_hold_room" }
         ]
     },
     "act1_press_taemin": {
         type: "system",
-        text: "[System] Room tension increased. Credibility -1.",
+        text: "[시스템] 채팅방 긴장도 상승. 신뢰도 -1.",
         subtype: "error",
         next: "act1_evidence_locklog"
     },
     "act1_hold_room": {
-        speaker: "Seoyun",
-        text: "Fine. We verify records first. No assumptions.",
+        speaker: "서윤",
+        text: "좋아. 감정 빼고 기록으로만 확인하자.",
         next: "act1_evidence_locklog"
     },
     "act1_evidence_locklog": {
         type: "evidence",
-        speaker: "Seoyun",
-        title: "door_lock_log_404.txt",
-        text: "02:31:11 -> UNLOCK\n02:31:15 -> OPEN\n02:38:02 -> OPEN\n[02:31:16~02:38:01 MISSING]",
+        speaker: "서윤",
+        title: "도어락_로그_404.txt",
+        text: "02:31:11 -> 잠금해제\n02:31:15 -> 문열림\n02:38:02 -> 문열림\n[02:31:16~02:38:01 구간 누락]",
         next: "act2_evidence_elevatorlog"
     },
     "act2_evidence_elevatorlog": {
         type: "evidence",
-        speaker: "Taemin",
-        title: "elevator_call_seq.csv",
-        text: "B1 -> 4F at 02:33\n4F -> 1F at 02:34\n1F -> 4F at 02:34\nSequence is physically impossible.",
+        speaker: "태민",
+        title: "엘리베이터_호출순서.csv",
+        text: "02:33 B1 -> 4F\n02:34 4F -> 1F\n02:34 1F -> 4F\n물리적으로 성립하기 어려운 호출 순서야.",
         next: "act2_choice"
     },
     "act2_choice": {
         type: "choice",
-        narration: "Choose escalation path.",
+        narration: "다음 대응을 선택하세요.",
         options: [
-            { label: "Force kick vote on Taemin now.", next: "act2_force_kickvote" },
-            { label: "Trace edit metadata chain first.", next: "act2_trace_metadata" }
+            { label: "지금 태민 강제퇴장 투표를 밀어붙인다.", next: "act2_force_kickvote" },
+            { label: "편집 메타데이터 체인을 먼저 추적한다.", next: "act2_trace_metadata" }
         ]
     },
     "act2_force_kickvote": {
         type: "system",
-        text: "[Permission error] Kick vote rejected. Role signatures mismatch.",
+        text: "[권한 오류] 강제퇴장 투표가 거부되었습니다. 역할 서명이 일치하지 않습니다.",
         subtype: "error",
         effect: "shake",
         next: "act2_evidence_powerlog"
     },
     "act2_trace_metadata": {
-        speaker: "Hana",
-        text: "Metadata says one account posted while marked offline. That's not network lag.",
+        speaker: "하나",
+        text: "오프라인으로 찍힌 계정이 동시에 글을 올렸어. 단순 지연이 아니야.",
         next: "act2_evidence_powerlog"
     },
     "act2_evidence_powerlog": {
         type: "evidence",
-        speaker: "Hana",
-        title: "hallway_power_draw.json",
-        text: "Power spike 02:34:20~02:34:53\nSame window contains 3 offline-tagged messages.",
+        speaker: "하나",
+        title: "복도_전력사용량.json",
+        text: "전력 스파이크: 02:34:20~02:34:53\n같은 구간에 오프라인 태그 메시지 3개가 겹친다.",
         next: "act2_silence_gap"
     },
     "act2_silence_gap": {
         type: "system",
-        text: "[No new messages for 9 seconds.]",
+        text: "[9초 동안 새 메시지가 없습니다.]",
         subtype: "glitch",
         next: "act3_intro"
     },
     "act3_intro": {
         type: "system",
-        text: "Retention timer active. Restore sequence starts now. 3 prompts.",
+        text: "보존 타이머 작동 중. 복원 절차를 시작합니다. 질문 3개.",
         next: "puzzle_1_revision_order"
     },
     "puzzle_1_revision_order": {
         type: "input",
-        placeholder: "Revision order of draft snapshots (e.g. BAC)",
+        placeholder: "초안 스냅샷 순서 입력 (예: BAC)",
         correctAnswer: "BAC",
         next: "puzzle_1_ok",
         failNext: "bad_fast_fail"
     },
     "puzzle_1_ok": {
         type: "system",
-        text: "Restore step 1 complete. Draft chain aligned.",
+        text: "복원 1단계 완료. 초안 체인이 정렬되었습니다.",
         next: "puzzle_2_impossible_timestamp"
     },
     "puzzle_2_impossible_timestamp": {
         type: "input",
-        placeholder: "Impossible timestamp in merged timeline (HHMMSS)",
+        placeholder: "통합 타임라인의 불가능한 시각 (HHMMSS)",
         correctAnswer: "231742",
         next: "puzzle_2_ok",
         failNext: "bad_fast_fail"
     },
     "puzzle_2_ok": {
         type: "system",
-        text: "Restore step 2 complete. Author scope narrowed.",
+        text: "복원 2단계 완료. 작성자 범위가 좁혀졌습니다.",
         next: "puzzle_3_backfill_author"
     },
     "puzzle_3_backfill_author": {
         type: "input",
-        placeholder: "Who backfilled the deleted line? (player)",
-        correctAnswer: "player",
+        placeholder: "삭제 라인을 되살린 주체는? (나)",
+        correctAnswer: "나",
         next: "puzzle_3_ok",
         failNext: "bad_fast_fail"
     },
     "puzzle_3_ok": {
         type: "system",
-        text: "Restore step 3 complete. Hidden diff unlocked.",
+        text: "복원 3단계 완료. 숨겨진 diff가 열렸습니다.",
         next: "act4_evidence_deleted_draft_diff"
     },
     "act4_evidence_deleted_draft_diff": {
         type: "evidence",
-        speaker: "Hana",
-        title: "report_draft.diff",
-        text: "- \"I was not there\"\n+ \"I held the railing and let go\"\nAuthor signature: ME (delayed edit queue)",
+        speaker: "하나",
+        title: "신고초안_변경내역.diff",
+        text: "- \"나는 거기 없었다\"\n+ \"난 난간을 잡았고, 결국 놓쳤다\"\n작성자 서명: 나 (지연 편집 큐)",
         next: "act4_account_conflict"
     },
     "act4_account_conflict": {
         type: "system",
-        text: "[Conflict] Same account posted from mutually exclusive states in the same minute.",
-        count: "3 participants",
+        text: "[충돌] 같은 계정이 같은 분 단위에서 상호 배타적 상태로 발화했습니다.",
+        count: "참여자 3명",
         next: "final_choice"
     },
     "final_choice": {
         type: "choice",
-        narration: "Choose your final stance.",
+        narration: "최종 입장을 선택하세요.",
         options: [
-            { label: "I accept it. I edited the timeline and failed the rescue.", next: "ending_true" },
-            { label: "I will re-report and submit full logs.", next: "ending_guilt" },
-            { label: "These logs are forged. None of this is real.", next: "ending_madness" },
-            { label: "Not now. Reset this room and stop here.", next: "ending_loop" }
+            { label: "인정할게. 타임라인을 고쳤고 구조에 실패했어.", next: "ending_true" },
+            { label: "전체 로그를 첨부해 다시 신고하겠다.", next: "ending_guilt" },
+            { label: "이 로그들 다 조작이야. 아무것도 믿을 수 없어.", next: "ending_madness" },
+            { label: "지금은 못 하겠다. 방을 초기화해.", next: "ending_loop" }
         ]
     },
     "ending_true": {
         type: "ending_sequence",
         sequence: [
-            { speaker: "Taemin", text: "That is the first honest line tonight.", delay: 1200 },
-            { type: "system", text: "[Record] Case tag updated: Failed Rescue / Self-edit admitted." },
-            { speaker: "Seoyun", text: "Then we finish this with facts.", delay: 1000 }
+            { speaker: "태민", text: "오늘 처음으로 진실한 문장이 나왔네.", delay: 1200 },
+            { type: "system", text: "[기록] 사건 태그 갱신: 구조 실패 / 자기 편집 인정." },
+            { speaker: "서윤", text: "이제 사실로 끝내자.", delay: 1000 }
         ],
         ending: {
-            label: "TRUE ENDING",
-            title: "Acceptance",
-            desc: "You accepted responsibility and restored the timeline.\nSilence returns to the room."
+            label: "진실 엔딩",
+            title: "수용",
+            desc: "당신은 책임을 인정하고 타임라인을 복원했다.\n채팅방에 처음으로 정적이 찾아온다."
         }
     },
     "ending_guilt": {
         type: "ending_sequence",
         sequence: [
-            { type: "system", text: "[Re-Report] Statement resubmitted with diff attachment." },
-            { type: "system", text: "[Dispatch] Investigator assigned." },
-            { speaker: "Hana", text: "Late truth is still truth.", delay: 900 }
+            { type: "system", text: "[재신고] diff 첨부 진술서가 접수되었습니다." },
+            { type: "system", text: "[배정] 담당 조사관이 지정되었습니다." },
+            { speaker: "하나", text: "늦어도 진실은 진실이야.", delay: 900 }
         ],
         ending: {
-            label: "GUILT ENDING",
-            title: "Surrender",
-            desc: "You chose legal responsibility.\nThe record remains painful but complete."
+            label: "책임 엔딩",
+            title: "자수",
+            desc: "당신은 법적 책임을 선택했다.\n기록은 아프지만, 이제 완전해졌다."
         }
     },
     "ending_madness": {
         type: "ending_sequence",
         sequence: [
-            { type: "system", text: "[Trust] Room trust collapsed to 0%." },
-            { type: "spam", texts: ["edited", "edited", "edited", "who wrote this"], delay: 170 },
-            { speaker: "Seoyun", text: "If all logs are fake, then so are you.", delay: 1200 }
+            { type: "system", text: "[신뢰] 채팅방 신뢰도가 0%로 붕괴했습니다." },
+            { type: "spam", texts: ["편집됨", "편집됨", "편집됨", "누가 쓴 거지"], delay: 170 },
+            { speaker: "서윤", text: "모든 로그가 가짜라면, 너도 가짜겠지.", delay: 1200 }
         ],
         ending: {
-            label: "MADNESS ENDING",
-            title: "Denial",
-            desc: "You denied the contradiction.\nThe room fractures into recursion and noise."
+            label: "부정 엔딩",
+            title: "부정",
+            desc: "당신은 모순을 거부했다.\n채팅방은 재귀와 잡음으로 붕괴한다."
         }
     },
     "ending_loop": {
         type: "ending_sequence",
         sequence: [
-            { type: "system", text: "[Retention timer] reset requested." },
-            { type: "system", text: "[error] previous reconstruction unavailable", subtype: "error" },
-            { type: "system", text: "[system] room recreated from partial cache", subtype: "error", delay: 1200 }
+            { type: "system", text: "[보존 타이머] 초기화 요청이 접수되었습니다." },
+            { type: "system", text: "[오류] 이전 복원 상태를 불러올 수 없습니다.", subtype: "error" },
+            { type: "system", text: "[시스템] 부분 캐시로 채팅방을 재생성합니다.", subtype: "error", delay: 1200 }
         ],
         ending: {
-            label: "LOOP ENDING",
-            title: "Deferral",
-            desc: "You deferred the truth.\nThe room reboots with less memory than before."
+            label: "루프 엔딩",
+            title: "유예",
+            desc: "당신은 진실을 미뤘다.\n채팅방은 이전보다 적은 기억으로 재시작된다."
         }
     },
     "bad_fast_fail": {
         type: "ending_sequence",
         sequence: [
-            { type: "system", text: "[Retention expired] Unrestored logs purged.", subtype: "error" },
-            { speaker: "Hana", text: "Now it's mostly noise. We lost the chain.", delay: 1000 }
+            { type: "system", text: "[보존 만료] 복원되지 않은 로그가 영구 삭제되었습니다.", subtype: "error" },
+            { speaker: "하나", text: "이제 거의 노이즈뿐이야. 연결 고리를 잃었어.", delay: 1000 }
         ],
         ending: {
-            label: "BAD ENDING",
-            title: "Purged",
-            desc: "You failed to restore the core sequence before purge.\nSuspicion survives, truth does not."
+            label: "배드 엔딩",
+            title: "소거",
+            desc: "핵심 시퀀스를 복원하기 전에 보존 시간이 끝났다.\n의심만 남고 진실은 사라진다."
         }
     }
 };
@@ -838,7 +838,7 @@ function getTime() {
     if (currentTime.m >= 60) { currentTime.m = 0; currentTime.h++; }
     if (currentTime.h >= 24) currentTime.h = 0;
     const h = currentTime.h;
-    const period = h < 12 ? 'AM' : 'PM';
+    const period = h < 12 ? '오전' : '오후';
     const displayH = h % 12 === 0 ? 12 : h % 12;
     return `${period} ${displayH}:${String(currentTime.m).padStart(2, '0')}`;
 }
@@ -1053,7 +1053,7 @@ async function showGhostRead(name) {
     if (lastRow) {
         const readDiv = document.createElement('div');
         readDiv.className = 'read-receipt ghost';
-        readDiv.innerText = `${name} read`;
+        readDiv.innerText = `${name} 읽음`;
         lastRow.querySelector('.msg-content')?.appendChild(readDiv);
         await wait(2500);
     }
@@ -1073,15 +1073,15 @@ async function playPrologue(data) {
         if (notif.hasImage) {
             imageHtml = `
                 <div class="notif-image">
-                    <img src="${notif.imageSrc}" onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=&quot;notif-image-placeholder&quot;>Image unavailable</span>';">
+                    <img src="${notif.imageSrc}" onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=&quot;notif-image-placeholder&quot;>이미지를 불러올 수 없습니다</span>';">
                 </div>`;
         }
 
         card.innerHTML = `
             <div class="notif-header">
-                <div class="notif-app-icon">MSG</div>
-                <span class="notif-app-name">${notif.isInvite ? 'Messenger Invite' : 'Messenger'}</span>
-                <span class="notif-time">Now</span>
+                <div class="notif-app-icon">알림</div>
+                <span class="notif-app-name">${notif.isInvite ? '메신저 초대' : '메신저'}</span>
+                <span class="notif-time">지금</span>
             </div>
             <div class="notif-sender">${notif.sender}</div>
             ${imageHtml}
@@ -1233,7 +1233,7 @@ async function playScene(sceneId) {
         interactionArea.innerHTML = '';
         const inputGroup = document.createElement('div');
         inputGroup.className = 'input-group';
-        inputGroup.innerHTML = `\n            <input type="text" id="answer-input" placeholder="${data.placeholder || 'Type answer...'}" autocomplete="off">\n            <button id="submit-btn">Send</button>\n        `;
+        inputGroup.innerHTML = `\n            <input type="text" id="answer-input" placeholder="${data.placeholder || '정답을 입력하세요...'}" autocomplete="off">\n            <button id="submit-btn">전송</button>\n        `;
         interactionArea.appendChild(inputGroup);
 
         const input = inputGroup.querySelector('#answer-input');
