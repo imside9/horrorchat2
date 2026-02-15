@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>기억의 늪: 심연</title>
+    <title>Room 404: Edit War</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
 
@@ -268,7 +268,7 @@
             align-items: center;
             gap: 6px;
         }
-        .evidence-title::before { content: '📎'; font-size: 0.9rem; }
+        .evidence-title::before { content: '???; font-size: 0.9rem; }
         .evidence-real-img {
             width: 100%;
             height: auto;
@@ -528,17 +528,17 @@
         <div class="ending-label">ENDING</div>
         <div class="ending-title" id="ending-title"></div>
         <div class="ending-desc" id="ending-desc"></div>
-        <button class="ending-restart" onclick="location.reload()">다시 시작</button>
+        <button class="ending-restart" onclick="location.reload()">??????살퓢?????꿔꺂???影?우Ŀ?/button>
     </div>
 
     <header>
-        <span class="header-back">←</span>
+        <span class="header-back">??/span>
         <div class="header-info">
-            <div class="room-title" id="room-title">동창회 (준비위원회)</div>
-            <div class="user-count" id="header-count">4명</div>
+            <div class="room-title" id="room-title">????嶺?筌??(?關???꾨き?筌욌끀??鍮㎳??????雅?퍔瑗?땟???</div>
+            <div class="user-count" id="header-count">4??/div>
         </div>
         <div class="header-icons">
-            <span>☰</span>
+            <span>??/span>
         </div>
     </header>
 
@@ -546,7 +546,7 @@
         <!-- Typing indicator -->
         <div class="typing-row" id="typing-row">
             <div class="avatar avatar-minsu" id="typing-avatar">
-                <img src="./images/profile_minsu.png" onerror="this.style.display='none'; this.parentElement.innerText='민';">
+                <img src="./images/profile_minsu.png" onerror="this.style.display='none'; this.parentElement.innerText='??;">
             </div>
             <div class="typing-bubble">
                 <div class="dot"></div><div class="dot"></div><div class="dot"></div>
@@ -559,7 +559,7 @@
 
 <script>
 // ============================================================
-// 기억의 늪: 심연 — 확장판
+// ??????鶯ㅺ동???怨몄쓥???? ????????轅붽틓???????
 // ============================================================
 
 // === CONFIG ===
@@ -571,31 +571,25 @@ let currentTime = { h: 23, m: 47 };
 
 // === CHARACTER DATA ===
 const CHARACTERS = {
-    '민수': {
-        avatarClass: 'avatar-minsu',
-        avatarImg: './images/profile_minsu.png',
-        avatarFallback: '민',
-        color: '#e05555'
-    },
-    '김영훈(A)': {
-        avatarClass: 'avatar-younghun',
-        avatarImg: './images/profile_younghun.png',
-        avatarFallback: '영',
-        color: '#5588cc'
-    },
-    '박지수(B)': {
+    'Seoyun': {
         avatarClass: 'avatar-jisu',
         avatarImg: './images/profile_jisu.png',
-        avatarFallback: '지',
+        avatarFallback: 'SY',
         color: '#aa66cc'
     },
-    '나': {
-        avatarClass: 'avatar-me',
-        avatarImg: './images/profile_me.png',
-        avatarFallback: '나',
-        color: '#55aa77'
+    'Taemin': {
+        avatarClass: 'avatar-younghun',
+        avatarImg: './images/profile_younghun.png',
+        avatarFallback: 'TM',
+        color: '#5588cc'
     },
-    '알 수 없는 사용자': {
+    'Hana': {
+        avatarClass: 'avatar-jisu',
+        avatarImg: './images/profile_jisu.png',
+        avatarFallback: 'HN',
+        color: '#c48f5a'
+    },
+    'Unknown User': {
         avatarClass: 'avatar-unknown',
         avatarImg: './images/profile_unknown.png',
         avatarFallback: '?',
@@ -605,572 +599,222 @@ const CHARACTERS = {
 
 // === SCENARIO ===
 const scenario = {
-
-    // ─── PROLOGUE ───
-    "prologue_1": {
+    "prologue_retention_notice": {
         type: "notification",
         notifications: [
-            { delay: 1500, sender: "알 수 없는 번호", text: "사진 1장을 전송했습니다.", hasImage: true, imageSrc: "./images/lake_rain.jpg" },
-            { delay: 2500, sender: "알 수 없는 번호", text: '"기억나?"' },
-            { delay: 3000, sender: "메신저", text: "'알 수 없는 사용자'님이 동창회 (준비위원회)에 초대했습니다.", isInvite: true }
+            { delay: 1000, sender: "System", text: "Room log retention expires in 20 minutes." },
+            { delay: 1800, sender: "Hana", text: "If we do this, we do it now. No media, logs only." },
+            { delay: 2400, sender: "Messenger", text: "You were invited to 'Room 404 Coordination'.", isInvite: true }
         ],
-        next: "start"
+        next: "start_invite"
     },
-
-    // ─── ACT 1: 균열 ───
-    "start": {
+    "start_invite": {
         type: "system",
-        text: "'알 수 없는 사용자'님이 나, 김영훈(A), 박지수(B)님을 초대했습니다.",
+        text: "[System] Temporary investigation room created. Participants synced.",
         next: "date_divider"
     },
     "date_divider": {
         type: "date",
-        text: "2026년 2월 13일 목요일",
-        next: "act1_1"
+        text: "Sunday, February 15, 2026",
+        next: "act1_accuse_open"
     },
-    "act1_1": {
-        speaker: "민수",
-        text: "얘들아, 진짜 오랜만이다. 다들 잘 지냈어?",
-        next: "act1_2"
-    },
-    "act1_2": {
-        speaker: "김영훈(A)",
-        text: "누구세요? 잘못 초대하신 것 같은데요.",
-        next: "act1_3"
-    },
-    "act1_3": {
-        speaker: "박지수(B)",
-        text: "...민수? 설마 박민수야?",
+    "act1_accuse_open": {
+        speaker: "Seoyun",
+        text: "No detours. Taemin was last on-site. Start there.",
         next: "act1_choice"
     },
     "act1_choice": {
         type: "choice",
-        narration: "3년 전 실종된 친구의 이름이다. 손에 땀이 난다.",
+        narration: "Push suspect now, or hold the room and inspect logs first.",
         options: [
-            { label: "민수야? 너 살아있었어?", next: "act1_react_good" },
-            { label: "누구야 너. 고인 모독하지 마.", next: "act1_react_bad" }
+            { label: "Taemin, explain your timeline first.", next: "act1_press_taemin" },
+            { label: "No blame yet. Start with lock logs.", next: "act1_hold_room" }
         ]
     },
-    "act1_react_good": {
-        speaker: "민수",
-        text: "살아있었냐니. 난 계속 여기 있었어. 너희들이 날 두고 간 곳에.",
-        next: "act1_4"
-    },
-    "act1_react_bad": {
-        speaker: "민수",
-        text: "고인? 시체도 못 찾았는데 벌써 죽은 사람 취급이네. 섭섭하게.",
-        next: "act1_4"
-    },
-    "act1_4": {
-        speaker: "김영훈(A)",
-        text: "야, 기분 나빠. 나 나갈게. 다들 나가자.",
-        next: "act1_system_fail"
-    },
-    "act1_system_fail": {
+    "act1_press_taemin": {
         type: "system",
-        text: "⚠ 김영훈(A)님이 대화방 나가기를 시도했으나 실패했습니다.",
-        effect: "shake",
+        text: "[System] Room tension increased. Credibility -1.",
         subtype: "error",
-        next: "act1_5"
+        next: "act1_evidence_locklog"
     },
-    "act1_5": {
-        speaker: "민수",
-        text: "영훈아, 넌 못 나가. 내 돈 500만원 아직 안 갚았잖아.",
-        next: "act1_6"
+    "act1_hold_room": {
+        speaker: "Seoyun",
+        text: "Fine. We verify records first. No assumptions.",
+        next: "act1_evidence_locklog"
     },
-    "act1_6": {
-        speaker: "김영훈(A)",
-        text: "뭐? 무슨 소리야! 난 빌린 적 없어!",
-        next: "act1_evidence_A"
-    },
-    "act1_evidence_A": {
+    "act1_evidence_locklog": {
         type: "evidence",
-        speaker: "민수",
-        title: "차용증_원본.jpg",
-        image: "./images/contract.jpg",
-        text: "이거 봐. 너 낚시터 가기 싫다고 했지? 사실은 내 지분 뺏으려고 억지로 끌고 간 거잖아.",
-        next: "act1_A_gone"
+        speaker: "Seoyun",
+        title: "door_lock_log_404.txt",
+        text: "02:31:11 -> UNLOCK\n02:31:15 -> OPEN\n02:38:02 -> OPEN\n[02:31:16~02:38:01 MISSING]",
+        next: "act2_evidence_elevatorlog"
     },
-    "act1_A_gone": {
-        type: "system",
-        text: "김영훈(A)님의 연결이 끊겼습니다.",
-        count: "3명",
-        next: "act1_deleted_msg"
-    },
-
-    // ─── 영훈의 마지막 메시지 (확장) ───
-    "act1_deleted_msg": {
-        type: "system",
-        text: "김영훈(A)님이 이미지를 전송했습니다. [로딩 실패]",
-        subtype: "error",
-        next: "act1_deleted_msg2"
-    },
-    "act1_deleted_msg2": {
-        type: "deleted",
-        speaker: "김영훈(A)",
-        originalText: "야, 민수 프로필 사진 눌러봐. 이상해--",
-        next: "act1_profile_choice"
-    },
-    "act1_profile_choice": {
-        type: "choice",
-        narration: "영훈이 뭔가를 발견한 것 같다. 삭제된 메시지가 신경 쓰인다.",
-        options: [
-            { label: "민수야, 영훈이 뭘 봤어?", next: "act1_profile_ask" },
-            { label: "(프로필 사진을 눌러본다)", next: "act1_profile_click" }
-        ]
-    },
-    "act1_profile_ask": {
-        speaker: "민수",
-        text: "신경 쓰지 마. 거짓말쟁이잖아.",
-        next: "act1_7"
-    },
-    "act1_profile_click": {
-        type: "system",
-        text: "[오류: 프로필을 불러올 수 없습니다. 해당 사용자는 존재하지 않습니다.]",
-        effect: "flash",
-        subtype: "error",
-        next: "act1_profile_click2"
-    },
-    "act1_profile_click2": {
-        speaker: "민수",
-        text: "왜 그래? 무슨 문제라도?",
-        next: "act1_7"
-    },
-    "act1_7": {
-        speaker: "박지수(B)",
-        text: "야... 이거 뭐야? 영훈이 진짜 나간 거야? 전화도 안 받아.",
-        next: "act1_8"
-    },
-    "act1_8": {
-        speaker: "민수",
-        text: "그리고 너, 지수야. 내 운동화 기억나?",
-        next: "evidence_1"
-    },
-    "evidence_1": {
+    "act2_evidence_elevatorlog": {
         type: "evidence",
-        speaker: "민수",
-        title: "현장사진_02.jpg",
-        image: "./images/shoes.jpg",
-        text: "비 오는 날 낚시터, 흙탕물에 반쯤 잠긴 내 나이키 에어포스. 네가 사준 거잖아.",
-        next: "act2_1"
-    },
-
-    // ─── ACT 2: 침식 ───
-    "act2_1": {
-        speaker: "민수",
-        text: "거짓말쟁이는 퇴장시켰어. 이제 우리끼리 얘기하자 지수야.",
-        next: "act2_2"
-    },
-    "act2_2": {
-        speaker: "박지수(B)",
-        text: "민수야 난 아니야! 난 너 찾으려고 경찰에도 신고했었어!",
+        speaker: "Taemin",
+        title: "elevator_call_seq.csv",
+        text: "B1 -> 4F at 02:33\n4F -> 1F at 02:34\n1F -> 4F at 02:34\nSequence is physically impossible.",
         next: "act2_choice"
     },
     "act2_choice": {
         type: "choice",
-        narration: "지수가 울먹이며 나에게 동의를 구한다.",
+        narration: "Choose escalation path.",
         options: [
-            { label: "맞아, 지수는 끝까지 널 찾았어.", next: "act2_lie" },
-            { label: "(침묵한다)", next: "act2_silence" }
+            { label: "Force kick vote on Taemin now.", next: "act2_force_kickvote" },
+            { label: "Trace edit metadata chain first.", next: "act2_trace_metadata" }
         ]
     },
-    "act2_lie": {
-        speaker: "민수",
-        text: "찾았다고? 넌 내가 사라져도 이틀이나 몰랐잖아. 내가 없어도 아무 상관없었으니까.",
-        next: "act2_evidence_B"
-    },
-    "act2_silence": {
-        speaker: "민수",
-        text: "그래, 넌 알고 있었지? 지수한테 나는 그냥 투명인간이었다는 거.",
-        next: "act2_evidence_B"
-    },
-    "act2_evidence_B": {
-        type: "evidence",
-        speaker: "민수",
-        title: "통화_녹음.mp3",
-        audioMode: true,
-        text: "지수야, 넌 내가 걱정된 게 아니잖아. 난 네 옆에 있어도 없는 사람이었어.",
-        next: "act2_jisu_newspaper"
-    },
-
-    // ─── 지수의 반격 (확장) ───
-    "act2_jisu_newspaper": {
-        type: "evidence",
-        speaker: "박지수(B)",
-        title: "뉴스기사_스크린샷.jpg",
-        image: "./images/newspaper.jpg",
-        text: "3년 전 신문 기사: '낚시터 실종 사건, 동행인 3명 혐의 없음 판정'",
-        next: "act2_jisu_4th"
-    },
-    "act2_jisu_4th": {
-        speaker: "박지수(B)",
-        text: "민수야, 이 기사 기억나? 우리 셋 다 조사받았어. 근데 이상한 거 있어.",
-        next: "act2_jisu_4th_2"
-    },
-    "act2_jisu_4th_2": {
-        speaker: "박지수(B)",
-        text: "경찰 조서에 4명이 갔다고 되어있거든. 우리 셋 말고 한 명 더.",
-        next: "act2_4th_choice"
-    },
-    "act2_4th_choice": {
-        type: "choice",
-        narration: "4명? 분명 3명이서 갔는데... 아니, 잠깐.",
-        options: [
-            { label: "네 번째 사람이 누구야?", next: "act2_4th_ask" },
-            { label: "(아무 말도 하지 않는다)", next: "act2_4th_silent" }
-        ]
-    },
-    "act2_4th_ask": {
-        speaker: "박지수(B)",
-        text: "그게... 기억이 안 나. 분명 누군가 더 있었는데...",
-        next: "act2_B_scream"
-    },
-    "act2_4th_silent": {
-        speaker: "민수",
-        text: "지수야, 쓸데없는 소리 그만해.",
-        speedOverride: FAST_TYPING,
-        next: "act2_B_scream"
-    },
-    "act2_B_scream": {
-        speaker: "박지수(B)",
-        text: "아냐.. 아냐!!! 잘못했어 민수야!!!",
-        next: "act2_B_gone"
-    },
-    "act2_B_gone": {
+    "act2_force_kickvote": {
         type: "system",
-        text: "박지수(B)님이 대화방에서 강제 퇴장당했습니다.",
-        count: "2명",
+        text: "[Permission error] Kick vote rejected. Role signatures mismatch.",
+        subtype: "error",
         effect: "shake",
-        next: "act2_count_glitch"
+        next: "act2_evidence_powerlog"
     },
-    "act2_count_glitch": {
+    "act2_trace_metadata": {
+        speaker: "Hana",
+        text: "Metadata says one account posted while marked offline. That's not network lag.",
+        next: "act2_evidence_powerlog"
+    },
+    "act2_evidence_powerlog": {
+        type: "evidence",
+        speaker: "Hana",
+        title: "hallway_power_draw.json",
+        text: "Power spike 02:34:20~02:34:53\nSame window contains 3 offline-tagged messages.",
+        next: "act2_silence_gap"
+    },
+    "act2_silence_gap": {
         type: "system",
-        text: "대화방 인원: 2명... 3명?",
+        text: "[No new messages for 9 seconds.]",
         subtype: "glitch",
-        next: "act2_count_fix"
-    },
-    "act2_count_fix": {
-        type: "count_fix",
-        count: "2명",
-        next: "act2_ghost_read"
-    },
-    "act2_ghost_read": {
-        type: "ghost_read",
-        target: "박지수(B)",
         next: "act3_intro"
     },
-
-    // ─── ACT 3: 심연 ───
     "act3_intro": {
-        speaker: "민수",
-        text: "이제 우리 둘만 남았네. 방해꾼들도 사라졌고.",
-        next: "act3_1"
+        type: "system",
+        text: "Retention timer active. Restore sequence starts now. 3 prompts.",
+        next: "puzzle_1_revision_order"
     },
-    "act3_1": {
-        speaker: "민수",
-        text: "너는 다르지? 넌 내 베프였잖아. 기억하지?",
-        next: "puzzle_1_intro"
-    },
-    "puzzle_1_intro": {
-        speaker: "민수",
-        text: "내가 너한테 보낸 마지막 파일이 있어. 잠겨있는데, 비밀번호가 우리 역사적인 그날이야.",
-        next: "puzzle_1_hint"
-    },
-    "puzzle_1_hint": {
-        speaker: "민수",
-        text: "2002년 월드컵 때 우리가 스페인 꺾고 4강 진출해서 광화문 난리 났던 날. 기억하지?\n월/일 4자리야.",
-        next: "puzzle_1_input"
-    },
-    "puzzle_1_input": {
+    "puzzle_1_revision_order": {
         type: "input",
-        placeholder: "비밀번호 4자리 입력 (힌트: 06??)",
-        correctAnswer: "0622",
-        next: "puzzle_1_correct",
-        failNext: "puzzle_1_fail"
+        placeholder: "Revision order of draft snapshots (e.g. BAC)",
+        correctAnswer: "BAC",
+        next: "puzzle_1_ok",
+        failNext: "bad_fast_fail"
     },
-    "puzzle_1_fail": {
-        speaker: "민수",
-        text: "와... 그날 같이 끌어안고 울었는데. 이걸 까먹어?",
-        speedOverride: FAST_TYPING,
-        next: "puzzle_1_fail2"
-    },
-    "puzzle_1_fail2": {
-        speaker: "민수",
-        text: "넌 친구도 아니야.",
-        next: "game_over_bad"
-    },
-    "puzzle_1_correct": {
+    "puzzle_1_ok": {
         type: "system",
-        text: "🔓 잠금 해제 성공 — 파일명: '그날의 진실.mov'",
-        next: "act3_2"
+        text: "Restore step 1 complete. Draft chain aligned.",
+        next: "puzzle_2_impossible_timestamp"
     },
-    "act3_2": {
-        speaker: "민수",
-        text: "역시 넌 기억하고 있구나. 그럼 그 장소도 기억하겠네.",
-        next: "puzzle_2_intro"
-    },
-    "puzzle_2_intro": {
-        speaker: "민수",
-        text: "비 내리던 낚시터. 내가 죽어가던 그 방갈로 호수 번호.",
-        next: "puzzle_2_input"
-    },
-    "puzzle_2_input": {
+    "puzzle_2_impossible_timestamp": {
         type: "input",
-        placeholder: "방갈로 호수 입력 (힌트: 죽을 사(死)자가 겹치는 불길한 숫자)",
-        correctAnswer: "444",
-        next: "puzzle_2_correct",
-        failNext: "puzzle_2_fail"
+        placeholder: "Impossible timestamp in merged timeline (HHMMSS)",
+        correctAnswer: "231742",
+        next: "puzzle_2_ok",
+        failNext: "bad_fast_fail"
     },
-    "puzzle_2_fail": {
-        speaker: "민수",
-        text: "기억 안 난다고? 네가 예약했잖아!!!",
-        speedOverride: FAST_TYPING,
-        next: "game_over_bad"
+    "puzzle_2_ok": {
+        type: "system",
+        text: "Restore step 2 complete. Author scope narrowed.",
+        next: "puzzle_3_backfill_author"
     },
-    "puzzle_2_correct": {
-        speaker: "민수",
-        text: "444호. 맞아. 거기서 네가 날 밀었지.",
-        next: "puzzle_3_intro"
-    },
-
-    // ─── 세 번째 퍼즐 (확장) ───
-    "puzzle_3_intro": {
-        speaker: "민수",
-        text: "마지막 하나. 그날 밤 내가 물에 빠지기 전에 마지막으로 한 말. 기억해?",
-        next: "puzzle_3_input"
-    },
-    "puzzle_3_input": {
+    "puzzle_3_backfill_author": {
         type: "input",
-        placeholder: "민수의 마지막 말을 입력하세요",
-        correctAnswer: "도와줘",
-        next: "puzzle_3_correct",
-        failNext: "puzzle_3_fail"
+        placeholder: "Who backfilled the deleted line? (player)",
+        correctAnswer: "player",
+        next: "puzzle_3_ok",
+        failNext: "bad_fast_fail"
     },
-    "puzzle_3_fail": {
-        speaker: "민수",
-        text: "거짓말. 넌 분명 들었어. 귀를 막았을 뿐이야.",
-        next: "game_over_bad"
-    },
-    "puzzle_3_correct": {
-        speaker: "민수",
-        text: "...맞아. 난 도와달라고 했어. 근데 넌 손을 뻗지 않았지.",
-        next: "climax_evidence"
-    },
-
-    "climax_evidence": {
-        type: "evidence",
-        speaker: "민수",
-        title: "CCTV_BlackBox.mov",
-        image: "./images/cctv.jpg",
-        text: "영상 속 남자는 울면서 민수를 밀어버리고 있다. 손목시계가 선명하다.",
-        next: "climax_cctv2"
-    },
-
-    // ─── 기억의 왜곡 (확장) ───
-    "climax_cctv2": {
-        type: "evidence",
-        speaker: "민수",
-        title: "CCTV_각도2.mov",
-        image: "./images/cctv2.jpg",
-        text: "같은 장면, 다른 각도. 이 영상에서는 민수를 미는 사람이... 2명이다.",
-        next: "climax_shadow"
-    },
-    "climax_shadow": {
-        speaker: "민수",
-        text: "영상이 두 개야. 하나는 네가 밀었고, 하나는...",
-        next: "climax_shadow2"
-    },
-    "climax_shadow2": {
-        speaker: "민수",
-        text: "네 뒤에 누가 서 있었는지 기억나?",
-        next: "climax_shadow_choice"
-    },
-    "climax_shadow_choice": {
-        type: "choice",
-        narration: "CCTV 영상 속 그림자. 분명 혼자였는데... 아니, 정말 혼자였나?",
-        options: [
-            { label: "아무도 없었어. 나 혼자였어.", next: "climax_shadow_deny" },
-            { label: "...누군가 있었던 것 같기도 해.", next: "climax_shadow_admit" }
-        ]
-    },
-    "climax_shadow_deny": {
-        speaker: "민수",
-        text: "정말? 그럼 이 그림자는 뭐지?",
-        next: "climax_address"
-    },
-    "climax_shadow_admit": {
-        speaker: "민수",
-        text: "이제야 기억이 돌아오는구나.",
-        next: "climax_address"
-    },
-    "climax_address": {
+    "puzzle_3_ok": {
         type: "system",
-        text: "⚠ 민수님이 위치 정보를 공유했습니다: [당신의 현재 주소]",
-        subtype: "error",
-        effect: "shake",
-        next: "act4_unknown_enter"
+        text: "Restore step 3 complete. Hidden diff unlocked.",
+        next: "act4_evidence_deleted_draft_diff"
     },
-
-    // ─── ACT 4: 반전 ───
-    "act4_unknown_enter": {
-        type: "system",
-        text: "'알 수 없는 사용자'님이 대화방에 입장했습니다.",
-        count: "3명",
-        next: "act4_unknown_1"
-    },
-    "act4_unknown_1": {
-        speaker: "알 수 없는 사용자",
-        text: "민수야, 그만해.",
-        next: "act4_unknown_2"
-    },
-    "act4_unknown_2": {
-        speaker: "알 수 없는 사용자",
-        text: "걔한테는 진실을 알 권리가 있어.",
-        next: "act4_minsu_react"
-    },
-    "act4_minsu_react": {
-        speaker: "민수",
-        text: "넌 왜 나와? 아직 때가 아닌데.",
-        speedOverride: FAST_TYPING,
-        next: "act4_group_photo"
-    },
-    "act4_group_photo": {
+    "act4_evidence_deleted_draft_diff": {
         type: "evidence",
-        speaker: "알 수 없는 사용자",
-        title: "단체사진_2023.jpg",
-        image: "./images/group_photo.jpg",
-        text: "4명이 찍혀있는 사진. 한 사람의 얼굴이 모자이크 처리되어 있다.",
-        next: "act4_unknown_3"
+        speaker: "Hana",
+        title: "report_draft.diff",
+        text: "- \"I was not there\"\n+ \"I held the railing and let go\"\nAuthor signature: ME (delayed edit queue)",
+        next: "act4_account_conflict"
     },
-    "act4_unknown_3": {
-        speaker: "알 수 없는 사용자",
-        text: "우리는 4명이었어. 넌 세 번째가 아니야.",
-        next: "act4_unknown_4"
-    },
-    "act4_unknown_4": {
-        speaker: "알 수 없는 사용자",
-        text: "그날 밤, 민수를 민 건 네가 아니야.",
-        next: "act4_minsu_rage"
-    },
-    "act4_minsu_rage": {
-        speaker: "민수",
-        text: "닥쳐!!!",
-        speedOverride: FAST_TYPING,
-        next: "act4_kick_fail"
-    },
-    "act4_kick_fail": {
+    "act4_account_conflict": {
         type: "system",
-        text: "민수님이 '알 수 없는 사용자'를 강제 퇴장시키려 합니다... [실패]",
-        subtype: "error",
-        next: "act4_unknown_5"
-    },
-    "act4_unknown_5": {
-        speaker: "알 수 없는 사용자",
-        text: "이 채팅방은 내가 만든 거야, 민수.",
-        next: "act4_full_cctv"
-    },
-    "act4_full_cctv": {
-        type: "evidence",
-        speaker: "알 수 없는 사용자",
-        title: "CCTV_전체영상_복원.mov",
-        image: "./images/cctv_full.jpg",
-        text: "전체 영상: 민수는 스스로 물에 뛰어들었다. 뒤에서 누군가 손을 뻗었지만 닿지 못했다.",
-        next: "act4_unknown_6"
-    },
-    "act4_unknown_6": {
-        speaker: "알 수 없는 사용자",
-        text: "민수는 자기가 뛰어든 걸 인정하고 싶지 않은 거야.",
-        next: "act4_unknown_7"
-    },
-    "act4_unknown_7": {
-        speaker: "알 수 없는 사용자",
-        text: "3년 동안 이 채팅방에서 같은 복수극을 반복하고 있어.",
-        next: "act4_minsu_break"
-    },
-    "act4_minsu_break": {
-        speaker: "민수",
-        text: "믿지 마... 걔가 거짓말하는 거야... 넌 날 밀었어...",
+        text: "[Conflict] Same account posted from mutually exclusive states in the same minute.",
+        count: "3 participants",
         next: "final_choice"
     },
-
-    // ─── FINAL CHOICE ───
     "final_choice": {
         type: "choice",
-        narration: "진실은 하나다. 당신은 무엇을 선택할 것인가.",
+        narration: "Choose your final stance.",
         options: [
-            { label: "민수야, 네가 뛰어든 거야. 나는 널 잡으려고 했어.", next: "ending_true" },
-            { label: "미안해... 내가 죽였어. 자수할게.", next: "ending_guilt" },
-            { label: "이건 조작이야! 다 거짓말이야!", next: "ending_madness" },
-            { label: "알 수 없는 사용자... 넌 누구야?", next: "ending_loop" }
+            { label: "I accept it. I edited the timeline and failed the rescue.", next: "ending_true" },
+            { label: "I will re-report and submit full logs.", next: "ending_guilt" },
+            { label: "These logs are forged. None of this is real.", next: "ending_madness" },
+            { label: "Not now. Reset this room and stop here.", next: "ending_loop" }
         ]
     },
-
-    // ─── ENDINGS ───
     "ending_true": {
         type: "ending_sequence",
         sequence: [
-            { speaker: "민수", text: "...거짓말이야... 거짓...", delay: 2000 },
-            { speaker: "민수", text: "...", delay: 3000 },
-            { type: "system", text: "민수님의 연결이 끊겼습니다." },
-            { speaker: "알 수 없는 사용자", text: "이제 끝났어. 나가도 돼.", delay: 2000 },
-            { type: "system", text: "대화방이 종료되었습니다." }
+            { speaker: "Taemin", text: "That is the first honest line tonight.", delay: 1200 },
+            { type: "system", text: "[Record] Case tag updated: Failed Rescue / Self-edit admitted." },
+            { speaker: "Seoyun", text: "Then we finish this with facts.", delay: 1000 }
         ],
         ending: {
             label: "TRUE ENDING",
-            title: "해방",
-            desc: "3년간의 죄책감이 만든 감옥에서\n당신은 마침내 걸어 나왔습니다.\n\n민수의 프로필 사진이 마지막으로 한 번 바뀌었습니다.\n— 웃고 있었습니다."
+            title: "Acceptance",
+            desc: "You accepted responsibility and restored the timeline.\nSilence returns to the room."
         }
     },
     "ending_guilt": {
         type: "ending_sequence",
         sequence: [
-            { speaker: "알 수 없는 사용자", text: "아냐, 그러지 마...", delay: 1500 },
-            { type: "system", text: "📍 경찰서 위치가 전송되었습니다." },
-            { speaker: "민수", text: "...고마워.", delay: 2000 }
+            { type: "system", text: "[Re-Report] Statement resubmitted with diff attachment." },
+            { type: "system", text: "[Dispatch] Investigator assigned." },
+            { speaker: "Hana", text: "Late truth is still truth.", delay: 900 }
         ],
         ending: {
             label: "GUILT ENDING",
-            title: "참회",
-            desc: "당신은 저지르지 않은 죄를 고백했습니다.\n\n경찰서로 향하는 길,\n민수의 프로필 사진이 웃고 있었습니다.\n\n그 미소가 용서인지 조롱인지는\n아무도 모릅니다."
+            title: "Surrender",
+            desc: "You chose legal responsibility.\nThe record remains painful but complete."
         }
     },
     "ending_madness": {
         type: "ending_sequence",
         sequence: [
-            { type: "system", text: "대화방 인원: 10명" },
-            { type: "system", text: "대화방 인원: 50명", delay: 500 },
-            { type: "system", text: "대화방 인원: 99명", delay: 300 },
-            { type: "spam", texts: ["너야", "네가 했어", "기억해", "도망칠 수 없어", "너야 너야 너야"], delay: 200 },
-            { speaker: "알 수 없는 사용자", text: "도망치면 안 되는데...", delay: 1500 }
+            { type: "system", text: "[Trust] Room trust collapsed to 0%." },
+            { type: "spam", texts: ["edited", "edited", "edited", "who wrote this"], delay: 170 },
+            { speaker: "Seoyun", text: "If all logs are fake, then so are you.", delay: 1200 }
         ],
         ending: {
             label: "MADNESS ENDING",
-            title: "망상",
-            desc: "채팅방은 닫히지 않습니다.\n알림음이 영원히 울립니다.\n\n99명의 참여자가\n당신의 이름을 부르고 있습니다."
+            title: "Denial",
+            desc: "You denied the contradiction.\nThe room fractures into recursion and noise."
         }
     },
     "ending_loop": {
         type: "ending_sequence",
         sequence: [
-            { speaker: "알 수 없는 사용자", text: "나? 나는...", delay: 2000 },
-            { type: "system", text: "[오류] 메시지를 불러올 수 없습니다.", subtype: "error" },
-            { type: "system", text: "[대화방이 초기화됩니다.]", subtype: "error", delay: 1500 }
+            { type: "system", text: "[Retention timer] reset requested." },
+            { type: "system", text: "[error] previous reconstruction unavailable", subtype: "error" },
+            { type: "system", text: "[system] room recreated from partial cache", subtype: "error", delay: 1200 }
         ],
         ending: {
-            label: "HIDDEN ENDING",
-            title: "루프",
-            desc: "이 대화는 처음이 아닙니다.\n끝도 아닙니다.\n\n방 제목이 바뀌어 있습니다:\n동창회 (준비위원회) — 127회차"
+            label: "LOOP ENDING",
+            title: "Deferral",
+            desc: "You deferred the truth.\nThe room reboots with less memory than before."
         }
     },
-    "game_over_bad": {
+    "bad_fast_fail": {
         type: "ending_sequence",
         sequence: [
-            { type: "system", text: "대화방이 종료되었습니다." }
+            { type: "system", text: "[Retention expired] Unrestored logs purged.", subtype: "error" },
+            { speaker: "Hana", text: "Now it's mostly noise. We lost the chain.", delay: 1000 }
         ],
         ending: {
             label: "BAD ENDING",
-            title: "실종",
-            desc: "당신은 민수의 질문에 대답하지 못했고,\n그 후로 아무도 당신을 보지 못했습니다.\n\n채팅 기록만이 남아있습니다."
+            title: "Purged",
+            desc: "You failed to restore the core sequence before purge.\nSuspicion survives, truth does not."
         }
     }
 };
@@ -1194,8 +838,8 @@ function getTime() {
     if (currentTime.m >= 60) { currentTime.m = 0; currentTime.h++; }
     if (currentTime.h >= 24) currentTime.h = 0;
     const h = currentTime.h;
-    const period = h < 12 ? '오전' : '오후';
-    const displayH = h <= 12 ? h : h - 12;
+    const period = h < 12 ? 'AM' : 'PM';
+    const displayH = h % 12 === 0 ? 12 : h % 12;
     return `${period} ${displayH}:${String(currentTime.m).padStart(2, '0')}`;
 }
 
@@ -1282,7 +926,7 @@ async function addMessage(data) {
         content.className = 'msg-content';
         content.innerHTML = `
             <span class="sender-name">${data.speaker}</span>
-            <div class="msg-bubble bubble-left msg-deleted">[이 메시지는 삭제되었습니다]</div>
+            <div class="msg-bubble bubble-left msg-deleted">[???饔낅떽????????????????????????</div>
         `;
         if (avatar) row.appendChild(avatar);
         row.appendChild(content);
@@ -1295,7 +939,7 @@ async function addMessage(data) {
     // --- EVIDENCE ---
     if (data.type === 'evidence') {
         lastSpeaker = null;
-        const isMe = data.speaker === '나';
+        const isMe = data.speaker === 'ME';
         const side = isMe ? 'right' : 'left';
 
         if (!isMe) {
@@ -1313,9 +957,9 @@ async function addMessage(data) {
         let mediaHtml = '';
         if (data.image) {
             mediaHtml = `
-                <img src="${data.image}" class="evidence-real-img" alt="증거"
+                <img src="${data.image}" class="evidence-real-img" alt="?饔낅떽??影?곗몡???紐?怨뚮옩鴉딅퀫??
                      onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                <div class="img-error">(이미지 없음: ${data.image})</div>`;
+                <div class="img-error">(?????饔낅떽???? ??????⑤뜤?? ${data.image})</div>`;
         } else if (data.audioMode) {
             const bars = Array.from({length: 20}, (_, i) =>
                 `<div class="bar" style="animation-duration:${0.3 + Math.random() * 0.6}s; animation-delay:${i * 0.05}s"></div>`
@@ -1355,7 +999,7 @@ async function addMessage(data) {
     }
 
     // --- REGULAR MESSAGE ---
-    const isMe = data.speaker === '나' || (data.speaker && data.speaker.includes('나('));
+    const isMe = data.speaker === 'ME' || (data.speaker && data.speaker.includes('ME'));
     const side = isMe ? 'right' : 'left';
     const sameAsBefore = (lastSpeaker === data.speaker && lastSide === side);
 
@@ -1402,19 +1046,18 @@ async function addMessage(data) {
     await wait(READING_DELAY);
 }
 
-// === GHOST READ (퇴장한 사람의 읽음 표시) ===
+// === GHOST READ (??????⑤뜪??????????????????癲? ===
 async function showGhostRead(name) {
     const allRows = chatWindow.querySelectorAll('.msg-row-left');
     const lastRow = allRows[allRows.length - 1];
     if (lastRow) {
         const readDiv = document.createElement('div');
         readDiv.className = 'read-receipt ghost';
-        readDiv.innerText = `${name} 읽음`;
+        readDiv.innerText = `${name} read`;
         lastRow.querySelector('.msg-content')?.appendChild(readDiv);
         await wait(2500);
     }
 }
-
 // === PROLOGUE ===
 async function playPrologue(data) {
     notifOverlay.innerHTML = '';
@@ -1430,15 +1073,15 @@ async function playPrologue(data) {
         if (notif.hasImage) {
             imageHtml = `
                 <div class="notif-image">
-                    <img src="${notif.imageSrc}" onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=notif-image-placeholder>🌧 비 오는 호수</span>';">
+                    <img src="${notif.imageSrc}" onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=&quot;notif-image-placeholder&quot;>Image unavailable</span>';">
                 </div>`;
         }
 
         card.innerHTML = `
             <div class="notif-header">
-                <div class="notif-app-icon">💬</div>
-                <span class="notif-app-name">${notif.isInvite ? '메신저' : '문자'}</span>
-                <span class="notif-time">지금</span>
+                <div class="notif-app-icon">MSG</div>
+                <span class="notif-app-name">${notif.isInvite ? 'Messenger Invite' : 'Messenger'}</span>
+                <span class="notif-time">Now</span>
             </div>
             <div class="notif-sender">${notif.sender}</div>
             ${imageHtml}
@@ -1462,7 +1105,6 @@ async function playPrologue(data) {
                         resolve();
                     }, 500);
                 };
-                // Auto-proceed after 5s
                 setTimeout(() => {
                     notifOverlay.style.transition = 'opacity 0.5s';
                     notifOverlay.style.opacity = '0';
@@ -1475,7 +1117,6 @@ async function playPrologue(data) {
         }
     }
 }
-
 // === ENDING SEQUENCE ===
 async function playEndingSequence(data) {
     interactionArea.innerHTML = '';
@@ -1579,7 +1220,7 @@ async function playScene(sceneId) {
             btn.innerText = opt.label;
             btn.onclick = async () => {
                 interactionArea.innerHTML = '';
-                await addMessage({ speaker: '나', text: opt.label });
+                await addMessage({ speaker: 'ME', text: opt.label });
                 playScene(opt.next);
             };
             interactionArea.appendChild(btn);
@@ -1592,10 +1233,7 @@ async function playScene(sceneId) {
         interactionArea.innerHTML = '';
         const inputGroup = document.createElement('div');
         inputGroup.className = 'input-group';
-        inputGroup.innerHTML = `
-            <input type="text" id="answer-input" placeholder="${data.placeholder || '답변 입력...'}" autocomplete="off">
-            <button id="submit-btn">전송</button>
-        `;
+        inputGroup.innerHTML = `\n            <input type="text" id="answer-input" placeholder="${data.placeholder || 'Type answer...'}" autocomplete="off">\n            <button id="submit-btn">Send</button>\n        `;
         interactionArea.appendChild(inputGroup);
 
         const input = inputGroup.querySelector('#answer-input');
@@ -1606,7 +1244,7 @@ async function playScene(sceneId) {
             const val = input.value.trim();
             if (!val) return;
             interactionArea.innerHTML = '';
-            await addMessage({ speaker: '나', text: val });
+            await addMessage({ speaker: 'ME', text: val });
 
             if (val.replace(/\s/g, '') === data.correctAnswer) {
                 playScene(data.next);
@@ -1636,7 +1274,7 @@ async function playScene(sceneId) {
 
 // === START ===
 window.onload = () => {
-    playScene('prologue_1');
+    playScene('prologue_retention_notice');
 };
 </script>
 </body>
