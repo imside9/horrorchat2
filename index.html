@@ -755,7 +755,7 @@ async function scene1_whoAreYou() {
   await addMsg("left", "알잖아.");
   await sleep(500);
   await showTyping(1200);
-  await addMsg("left", "오늘 새벽 단톡방에서 네가 한 말.");
+  await addMsg("left", "오늘 새벽, 반단톡방에서 네가 한 말.");
   await sleep(400);
   showContinue(scene1_recall);
 }
@@ -806,9 +806,9 @@ async function scene1_recall() {
   addTimestamp("— 현재 —");
   await sleep(400);
   await showTyping(1200);
-  await addMsg("left", "그 한 줄이 분위기를 바꿨어.");
+  await addMsg("left", "네 그 한마디 때문에 분위기가 바뀌었어.");
   await showTyping(1000);
-  await addMsg("left", "네가 가담하자 나머지도 더 신나서 달려들었지.");
+  await addMsg("left", "다른 애들도 네 말을 보고 더 신나서 달려들었지.");
   await sleep(300);
   await addMsg("center", "화면을 보면서 뭔가 잘못됐다는 걸 알고 있었다.", {thought:true});
   await addMsg("center", "그런데 멈추지 않았다.", {thought:true});
@@ -913,10 +913,7 @@ async function scene2_entry() {
   addTimestamp("새벽 2:14 AM");
   await sleep(400);
   await showTyping(1400);
-  await addMsg("left", "그래서 나한테 왜 연락한 거야.");
-  await sleep(300);
-  await showTyping(1100);
-  await addMsg("left", "협박이야? 캡처 뿌리려고?");
+  await addMsg("right", "그래서 나한테 왜 연락한 거야.");
   await sleep(400);
 
   showChoices([
@@ -942,7 +939,7 @@ async function scene2_accusation() {
   await showTyping(900);
   await addMsg("left", "협박이었으면 이미 했겠지.");
   await showTyping(1300);
-  await addMsg("left", "넌 밀려날까봐 그랬어. 그게 핵심이야.");
+  await addMsg("left", "넌 아이들 사이에서 밀려날까봐 그랬어. 그게 핵심이야.");
   await sleep(400);
   showContinue(scene2_core_talk);
 }
