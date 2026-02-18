@@ -1,972 +1,1605 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>404호 답하지 않은 밤</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRO</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500&family=Share+Tech+Mono&display=swap');
 
-        :root {
-            --bg-color: #080808;
-            --chat-bg: #111;
-            --my-msg-bg: #2e4e3e;
-            --other-msg-bg: #1e1e1e;
-            --system-msg-bg: #1a1a1a;
-            --accent: #b71c1c;
-            --text-main: #dcdcdc;
-            --font: 'Noto Sans KR', sans-serif;
-        }
+  :root {
+    --bg: #0a0c10;
+    --surface: #10131a;
+    --surface2: #161b25;
+    --border: #1e2535;
+    --text-main: #d8dde8;
+    --text-dim: #5a6278;
+    --text-dimmer: #2e3448;
+    --accent-pro: #7eb8d4;
+    --accent-pro-glow: rgba(126,184,212,0.15);
+    --accent-me: #e8b86d;
+    --accent-sys: #3a4055;
+    --accent-sys-text: #7a8099;
+    --accent-warn: #c0392b;
+    --accent-green: #4caf7d;
+    --bubble-pro: #131920;
+    --bubble-me: #1a1a2e;
+    --font-main: 'Noto Sans KR', sans-serif;
+    --font-mono: 'Share Tech Mono', monospace;
+  }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: var(--font);
-            display: flex;
-            justify-content: center;
-            height: 100vh;
-            overflow: hidden;
-        }
+  body {
+    background: var(--bg);
+    color: var(--text-main);
+    font-family: var(--font-main);
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
 
-        #game-frame {
-            width: 100%;
-            max-width: 480px;
-            background-color: var(--chat-bg);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
-        }
+  #game-wrapper {
+    width: 100%;
+    max-width: 480px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    position: relative;
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+  }
 
-        /* === HEADER === */
-        header {
-            padding: 12px 16px;
-            border-bottom: 1px solid #2a2a2a;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: rgba(15, 15, 15, 0.98);
-            z-index: 10;
-        }
-        .header-back {
-            color: #888;
-            font-size: 1.2rem;
-            cursor: pointer;
-        }
-        .header-info { flex: 1; }
-        .room-title { font-weight: 500; font-size: 0.95rem; letter-spacing: -0.5px; }
-        .user-count { font-size: 0.75rem; color: #666; transition: color 0.3s; }
-        .user-count.alert { color: var(--accent); animation: blink 1s infinite; }
-        .header-icons { display: flex; gap: 16px; color: #888; font-size: 0.9rem; }
+  #chat-header {
+    padding: 14px 18px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    z-index: 10;
+  }
 
-        /* === CHAT WINDOW === */
-        #chat-window {
-            flex: 1;
-            padding: 16px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            scroll-behavior: smooth;
-            padding-bottom: 20px;
-        }
-        #chat-window::-webkit-scrollbar { width: 4px; }
-        #chat-window::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+  #avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: var(--text-dim);
+    flex-shrink: 0;
+    transition: background 0.5s, color 0.5s, box-shadow 0.5s;
+  }
 
-        /* === DATE DIVIDER === */
-        .date-divider {
-            text-align: center;
-            color: #555;
-            font-size: 0.7rem;
-            margin: 16px 0;
-            position: relative;
-        }
-        .date-divider::before, .date-divider::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            width: 30%;
-            height: 1px;
-            background: #2a2a2a;
-        }
-        .date-divider::before { left: 0; }
-        .date-divider::after { right: 0; }
+  #avatar.pro {
+    background: var(--accent-pro-glow);
+    color: var(--accent-pro);
+    border: 1px solid rgba(126,184,212,0.3);
+    box-shadow: 0 0 12px var(--accent-pro-glow);
+  }
 
-        /* === MESSAGE ROWS === */
-        .msg-row {
-            display: flex;
-            gap: 8px;
-            max-width: 85%;
-            opacity: 0;
-            animation: fadeIn 0.4s forwards;
-        }
-        .msg-row-left { align-self: flex-start; }
-        .msg-row-right { align-self: flex-end; flex-direction: row-reverse; }
+  #sender-info { flex: 1; }
 
-        /* === PROFILE AVATAR === */
-        .avatar {
-            width: 36px;
-            height: 36px;
-            min-width: 36px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: #fff;
-            overflow: hidden;
-            position: relative;
-            margin-top: 2px;
-        }
-        .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .avatar-minsu { background: #3a1a1a; border: 1px solid #5a2a2a; }
-        .avatar-younghun { background: #1a2a3a; border: 1px solid #2a3a5a; }
-        .avatar-jisu { background: #2a1a3a; border: 1px solid #3a2a5a; }
-        .avatar-me { background: #1a3a2a; border: 1px solid #2a5a3a; }
-        .avatar-unknown {
-            background: #1a1a1a;
-            border: 1px solid #444;
-            animation: glitchAvatar 3s infinite;
-        }
-        .avatar-system {
-            background: none;
-            border: 1px solid #333;
-            color: #555;
-            font-size: 0.6rem;
-        }
+  #sender-name {
+    font-size: 13px; font-weight: 500;
+    color: var(--text-main);
+    letter-spacing: 0.02em;
+    transition: color 0.5s;
+    font-family: var(--font-mono);
+  }
 
-        @keyframes glitchAvatar {
-            0%, 95%, 100% { filter: none; }
-            96% { filter: hue-rotate(90deg) brightness(2); }
-            97% { filter: hue-rotate(-90deg) brightness(0.5); }
-        }
+  #sender-name.pro { color: var(--accent-pro); }
 
-        /* === MESSAGE BUBBLE === */
-        .msg-content { display: flex; flex-direction: column; }
-        .sender-name { font-size: 0.7rem; color: #888; margin-bottom: 3px; margin-left: 2px; }
-        .msg-bubble {
-            padding: 9px 13px;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            line-height: 1.55;
-            word-break: break-all;
-            position: relative;
-        }
-        .bubble-left {
-            background: var(--other-msg-bg);
-            border-top-left-radius: 2px;
-            color: #e0e0e0;
-        }
-        .bubble-right {
-            background: var(--my-msg-bg);
-            border-top-right-radius: 2px;
-            color: #fff;
-        }
-        .msg-time {
-            font-size: 0.6rem;
-            color: #555;
-            margin-top: 3px;
-            align-self: flex-end;
-        }
-        .msg-row-right .msg-time { align-self: flex-start; }
-        .msg-row-right .sender-name { display: none; }
+  #sender-sub { font-size: 11px; color: var(--text-dim); margin-top: 2px; font-family: var(--font-mono); }
+  #time-display { font-size: 11px; color: var(--text-dimmer); font-family: var(--font-mono); }
 
-        /* Read receipt */
-        .read-receipt {
-            font-size: 0.6rem;
-            color: #b71c1c55;
-            margin-top: 1px;
-        }
-        .read-receipt.ghost {
-            animation: ghostRead 2s forwards;
-        }
-        @keyframes ghostRead {
-            0% { opacity: 0; }
-            30% { opacity: 1; color: var(--accent); }
-            70% { opacity: 1; }
-            100% { opacity: 0; }
-        }
+  #chat-log {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    scroll-behavior: smooth;
+  }
 
-        /* === SYSTEM MESSAGE === */
-        .msg-system {
-            align-self: center;
-            background: none;
-            color: #666;
-            font-size: 0.72rem;
-            text-align: center;
-            padding: 6px 14px;
-            border: 1px solid #2a2a2a;
-            border-radius: 20px;
-            margin: 12px 0;
-            width: fit-content;
-            opacity: 0;
-            animation: fadeIn 0.4s forwards;
-        }
-        .msg-system.error {
-            border-color: #5a2a2a;
-            color: #cc4444;
-        }
-        .msg-system.glitch {
-            animation: fadeIn 0.4s forwards, textGlitch 0.3s ease-in-out;
-        }
+  #chat-log::-webkit-scrollbar { width: 3px; }
+  #chat-log::-webkit-scrollbar-track { background: transparent; }
+  #chat-log::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-        /* === DELETED MESSAGE === */
-        .msg-deleted {
-            font-style: italic;
-            color: #555;
-            font-size: 0.8rem;
-        }
+  .msg-row {
+    display: flex;
+    opacity: 0;
+    transform: translateY(8px);
+    animation: msgIn 0.3s ease forwards;
+  }
 
-        /* === TYPING INDICATOR === */
-        .typing-row {
-            display: flex;
-            gap: 8px;
-            align-self: flex-start;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .typing-row.visible { opacity: 1; }
-        .typing-bubble {
-            background: var(--other-msg-bg);
-            padding: 10px 15px;
-            border-radius: 12px;
-            border-top-left-radius: 2px;
-            display: flex;
-            gap: 4px;
-            align-items: center;
-        }
-        .dot {
-            width: 5px; height: 5px;
-            background: #555;
-            border-radius: 50%;
-            animation: bounce 1.4s infinite;
-        }
-        .dot:nth-child(2) { animation-delay: 0.2s; }
-        .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes msgIn { to { opacity: 1; transform: translateY(0); } }
 
-        /* === EVIDENCE BOX === */
-        .evidence-box {
-            background: #0a0a0a;
-            border: 1px solid #333;
-            padding: 12px;
-            border-radius: 8px;
-            margin-top: 6px;
-        }
-        .evidence-title {
-            color: var(--accent);
-            font-weight: 700;
-            font-size: 0.8rem;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .evidence-title::before { content: '?뱨'; font-size: 0.9rem; }
-        .evidence-real-img {
-            width: 100%;
-            height: auto;
-            border-radius: 4px;
-            margin-bottom: 8px;
-            border: 1px solid #2a2a2a;
-            display: block;
-        }
-        .evidence-desc { color: #888; font-size: 0.82rem; font-style: italic; line-height: 1.5; }
-        .img-error { color: #cc4444; font-size: 0.75rem; margin-bottom: 5px; display: none; }
+  .msg-row.left { justify-content: flex-start; }
+  .msg-row.right { justify-content: flex-end; }
+  .msg-row.center { justify-content: center; }
 
-        /* === AUDIO PLAYER === */
-        .audio-player {
-            background: #1a1a1a;
-            border-radius: 24px;
-            padding: 10px 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 8px;
-            border: 1px solid #333;
-        }
-        .play-icon {
-            width: 0; height: 0;
-            border-top: 7px solid transparent;
-            border-bottom: 7px solid transparent;
-            border-left: 12px solid #fff;
-            cursor: pointer;
-        }
-        .waveform {
-            flex: 1; height: 24px;
-            display: flex; align-items: center; gap: 2px;
-        }
-        .bar {
-            background: #555; width: 3px; border-radius: 1px;
-            animation: wave 1s infinite ease-in-out;
-        }
-        .audio-time { color: #666; font-size: 0.7rem; min-width: 32px; }
+  .bubble {
+    max-width: 80%;
+    padding: 10px 14px;
+    border-radius: 16px;
+    font-size: 13.5px;
+    line-height: 1.7;
+    word-break: keep-all;
+  }
 
-        /* === INTERACTION AREA === */
-        #interaction-area {
-            background: #0d0d0d;
-            border-top: 1px solid #2a2a2a;
-            padding: 14px;
-            min-height: 80px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        .btn-choice {
-            width: 100%;
-            background: #1a1a1a;
-            border: 1px solid #333;
-            color: #ccc;
-            padding: 13px 16px;
-            margin-bottom: 7px;
-            border-radius: 8px;
-            text-align: left;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-family: var(--font);
-            transition: 0.2s;
-            line-height: 1.4;
-        }
-        .btn-choice:hover { background: #252525; color: white; border-color: #555; }
-        .btn-choice:active { transform: scale(0.98); }
+  .bubble.left {
+    background: var(--bubble-pro);
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 4px;
+    color: var(--text-main);
+  }
 
-        /* === NOTIFICATION OVERLAY (Prologue) === */
-        #notification-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: #0a0a0a;
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 40px;
-        }
-        .notif-card {
-            background: #1a1a1a;
-            border: 1px solid #333;
-            border-radius: 16px;
-            padding: 20px;
-            width: 100%;
-            max-width: 320px;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.5s;
-        }
-        .notif-card.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        .notif-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-        .notif-app-icon {
-            width: 24px; height: 24px;
-            background: #333;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-        }
-        .notif-app-name { font-size: 0.7rem; color: #888; }
-        .notif-time { font-size: 0.65rem; color: #555; margin-left: auto; }
-        .notif-sender { font-weight: 500; font-size: 0.9rem; margin-bottom: 6px; }
-        .notif-text { color: #aaa; font-size: 0.85rem; line-height: 1.5; }
-        .notif-image {
-            width: 100%;
-            height: 160px;
-            background: #111;
-            border-radius: 8px;
-            margin: 10px 0;
-            border: 1px solid #2a2a2a;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .notif-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .notif-image-placeholder {
-            color: #444;
-            font-size: 0.75rem;
-        }
+  .bubble.left.pro-style {
+    border-color: rgba(126,184,212,0.2);
+  }
 
-        /* === ENDING OVERLAY === */
-        #ending-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.95);
-            z-index: 100;
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 40px;
-            text-align: center;
-        }
-        .ending-label {
-            font-size: 0.7rem;
-            color: var(--accent);
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            margin-bottom: 16px;
-        }
-        .ending-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            line-height: 1.4;
-        }
-        .ending-desc {
-            color: #888;
-            font-size: 0.85rem;
-            line-height: 1.7;
-            max-width: 320px;
-        }
-        .ending-restart {
-            margin-top: 40px;
-            background: none;
-            border: 1px solid #444;
-            color: #888;
-            padding: 12px 32px;
-            border-radius: 24px;
-            cursor: pointer;
-            font-family: var(--font);
-            font-size: 0.85rem;
-            transition: 0.2s;
-        }
-        .ending-restart:hover { border-color: #888; color: #fff; }
+  .bubble.right {
+    background: var(--bubble-me);
+    border: 1px solid #252a3d;
+    border-bottom-right-radius: 4px;
+    color: var(--accent-me);
+  }
 
-        /* === ANIMATIONS === */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(4px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-4px); }
-        }
-        @keyframes blink {
-            0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; }
-        }
-        @keyframes wave {
-            0%, 100% { height: 4px; } 50% { height: 18px; }
-        }
-        @keyframes shake {
-            10%, 90% { transform: translate3d(-1px, 0, 0); }
-            20%, 80% { transform: translate3d(2px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-            40%, 60% { transform: translate3d(4px, 0, 0); }
-        }
-        @keyframes textGlitch {
-            0% { transform: translate(0); }
-            20% { transform: translate(-2px, 1px); }
-            40% { transform: translate(2px, -1px); filter: hue-rotate(90deg); }
-            60% { transform: translate(-1px, -1px); }
-            80% { transform: translate(1px, 1px); filter: hue-rotate(-90deg); }
-            100% { transform: translate(0); filter: none; }
-        }
-        @keyframes screenFlash {
-            0% { opacity: 1; }
-            25% { opacity: 0; }
-            50% { opacity: 1; }
-            75% { opacity: 0.3; }
-            100% { opacity: 1; }
-        }
-        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
-        .flash { animation: screenFlash 0.5s ease-in-out; }
-    </style>
+  .bubble.system {
+    background: transparent;
+    color: var(--accent-sys-text);
+    font-size: 11.5px;
+    font-family: var(--font-mono);
+    padding: 4px 10px;
+    border: 1px solid var(--accent-sys);
+    border-radius: 6px;
+    text-align: center;
+    max-width: 90%;
+  }
+
+  .bubble.system.green { color: var(--accent-green); border-color: rgba(76,175,125,0.4); }
+  .bubble.system.warn { color: #c97777; border-color: rgba(192,57,43,0.3); }
+  .bubble.system.blue { color: var(--accent-pro); border-color: rgba(126,184,212,0.25); }
+
+  .bubble.thought {
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    font-size: 12.5px;
+    font-style: italic;
+    max-width: 90%;
+    padding: 2px 8px;
+  }
+
+  .timestamp-group {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-dimmer);
+    margin: 10px 0 4px;
+    font-family: var(--font-mono);
+  }
+
+  .recall-bubble {
+    background: rgba(10,12,16,0.92);
+    border: 1px solid #252a3d;
+    border-radius: 10px;
+    padding: 14px 16px;
+    max-width: 92%;
+    opacity: 0;
+    animation: msgIn 0.4s ease forwards;
+  }
+
+  .recall-title {
+    font-size: 10px;
+    color: var(--text-dimmer);
+    font-family: var(--font-mono);
+    margin-bottom: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .recall-msg {
+    font-size: 12.5px;
+    color: var(--text-dim);
+    line-height: 1.75;
+    margin-bottom: 3px;
+  }
+
+  .recall-msg.mine { color: #e07070; }
+  .recall-msg.sys { color: var(--text-dimmer); font-family: var(--font-mono); font-size: 11px; }
+  .recall-msg.highlight { color: #c9d6e8; }
+
+  #typing-indicator { display: none; padding: 0 14px 8px; }
+  #typing-indicator.show { display: flex; }
+
+  .typing-dots {
+    display: flex; gap: 4px; align-items: center;
+    padding: 8px 12px;
+    background: var(--bubble-pro);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    border-bottom-left-radius: 4px;
+  }
+
+  .dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--text-dim);
+    animation: dotBounce 1.2s infinite;
+  }
+
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes dotBounce {
+    0%,60%,100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-4px); opacity: 1; }
+  }
+
+  #choice-area {
+    padding: 12px 14px 16px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .choice-label {
+    font-size: 10px;
+    color: var(--text-dimmer);
+    font-family: var(--font-mono);
+    letter-spacing: 0.1em;
+    margin-bottom: 2px;
+  }
+
+  .choice-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 14px;
+    color: var(--text-main);
+    font-size: 13px;
+    font-family: var(--font-main);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.18s;
+    opacity: 0;
+    transform: translateY(6px);
+    animation: choiceIn 0.25s ease forwards;
+    line-height: 1.55;
+  }
+
+  .choice-btn:nth-child(2) { animation-delay: 0.06s; }
+  .choice-btn:nth-child(3) { animation-delay: 0.12s; }
+  .choice-btn:nth-child(4) { animation-delay: 0.18s; }
+  .choice-btn:nth-child(5) { animation-delay: 0.24s; }
+
+  @keyframes choiceIn { to { opacity: 1; transform: translateY(0); } }
+
+  .choice-btn:hover { background: #1a1f2e; border-color: #2e3550; color: #fff; }
+
+  .choice-btn.locked { opacity: 0.25 !important; cursor: not-allowed; filter: grayscale(1); pointer-events: none; }
+  .choice-btn.pay-btn { border-color: rgba(76,175,125,0.4); color: var(--accent-green); }
+  .choice-btn.pay-btn:hover { background: rgba(76,175,125,0.08); }
+  .choice-btn.danger-btn { border-color: rgba(192,57,43,0.3); color: #c97777; }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20% { transform: translateX(-3px); }
+    40% { transform: translateX(3px); }
+    60% { transform: translateX(-2px); }
+    80% { transform: translateX(2px); }
+  }
+
+  .shake { animation: shake 0.45s ease; }
+
+  @keyframes nameReveal {
+    0% { opacity: 0; transform: translateY(-4px); filter: blur(4px); }
+    100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+  }
+
+  .name-reveal { animation: nameReveal 0.7s ease forwards; }
+
+  #ending-screen {
+    position: absolute; inset: 0;
+    background: #000;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 40px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 1.4s ease;
+    z-index: 100;
+    text-align: center;
+  }
+
+  #ending-screen.show { opacity: 1; pointer-events: all; }
+
+  #ending-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-dimmer);
+    margin-bottom: 16px;
+  }
+
+  #ending-title {
+    font-size: 20px;
+    font-weight: 300;
+    letter-spacing: 0.12em;
+    margin-bottom: 36px;
+    color: var(--accent-pro);
+  }
+
+  #ending-text {
+    font-size: 14px;
+    line-height: 2.1;
+    color: var(--text-dim);
+    max-width: 320px;
+    white-space: pre-line;
+  }
+
+  #ending-note {
+    margin-top: 28px;
+    font-size: 11px;
+    font-family: var(--font-mono);
+    color: var(--text-dimmer);
+    line-height: 1.8;
+  }
+
+  #restart-btn {
+    margin-top: 44px;
+    padding: 10px 28px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dimmer);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s;
+  }
+
+  #restart-btn:hover { border-color: var(--text-dim); color: var(--text-main); }
+
+  #intro-screen {
+    position: absolute; inset: 0;
+    background: var(--bg);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 50;
+    transition: opacity 0.9s ease;
+  }
+
+  #intro-screen.hide { opacity: 0; pointer-events: none; }
+
+  #intro-title {
+    font-family: var(--font-mono);
+    font-size: 48px;
+    letter-spacing: 0.4em;
+    color: var(--accent-pro);
+    margin-bottom: 6px;
+    text-shadow: 0 0 40px var(--accent-pro-glow);
+  }
+
+  #intro-sub {
+    font-size: 11px;
+    color: var(--text-dimmer);
+    font-family: var(--font-mono);
+    letter-spacing: 0.2em;
+    margin-bottom: 10px;
+  }
+
+  #intro-desc {
+    font-size: 12px;
+    color: var(--text-dim);
+    text-align: center;
+    max-width: 280px;
+    line-height: 1.8;
+    margin-bottom: 52px;
+  }
+
+  #start-btn {
+    padding: 12px 36px;
+    background: transparent;
+    border: 1px solid rgba(126,184,212,0.3);
+    color: var(--accent-pro);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s;
+  }
+
+  #start-btn:hover { background: var(--accent-pro-glow); border-color: var(--accent-pro); }
+
+  .continue-btn {
+    align-self: center;
+    margin-top: 4px;
+    padding: 8px 22px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dimmer);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.18s;
+    opacity: 0;
+    animation: choiceIn 0.25s 0.3s ease forwards;
+  }
+
+  .continue-btn:hover { border-color: var(--text-dim); color: var(--text-main); }
+
+  /* Progress */
+  #progress-bar {
+    height: 2px;
+    background: var(--border);
+    position: relative;
+  }
+
+  #progress-fill {
+    height: 100%;
+    background: rgba(126,184,212,0.3);
+    transition: width 1s ease;
+    width: 0%;
+  }
+</style>
 </head>
 <body>
 
-<div id="game-frame">
-    <!-- NOTIFICATION OVERLAY (Prologue) -->
-    <div id="notification-overlay"></div>
+<div id="game-wrapper">
 
-    <!-- ENDING OVERLAY -->
-    <div id="ending-overlay">
-        <div class="ending-label">엔딩</div>
-        <div class="ending-title" id="ending-title"></div>
-        <div class="ending-desc" id="ending-desc"></div>
-        <button class="ending-restart" onclick="location.reload()">다시 플레이</button>
+  <div id="intro-screen">
+    <div id="intro-title">PRO</div>
+    <div id="intro-sub">a chat horror game</div>
+    <div id="intro-desc">누군가 새벽에 메시지를 보냈다.<br>모르는 번호였다.<br>그런데 내용이 낯설지 않았다.</div>
+    <button id="start-btn" onclick="startGame()">▶ 시작</button>
+  </div>
+
+  <div id="ending-screen">
+    <div id="ending-label"></div>
+    <div id="ending-title"></div>
+    <div id="ending-text"></div>
+    <div id="ending-note"></div>
+    <button id="restart-btn" onclick="restartGame()">처음부터</button>
+  </div>
+
+  <div id="chat-header">
+    <div id="avatar">?</div>
+    <div id="sender-info">
+      <div id="sender-name">010-XXXX-XXXX</div>
+      <div id="sender-sub">모르는 번호</div>
     </div>
+    <div id="time-display">1:47 AM</div>
+  </div>
 
-    <header>
-        <span class="header-back">←</span>
-        <div class="header-info">
-            <div class="room-title" id="room-title">404호 단체 채팅방</div>
-            <div class="user-count" id="header-count">참여자 4명</div>
-        </div>
-        <div class="header-icons">
-            <span>⋯</span>
-        </div>
-    </header>
+  <div id="progress-bar"><div id="progress-fill"></div></div>
 
-    <div id="chat-window">
-        <!-- Typing indicator -->
-        <div class="typing-row" id="typing-row">
-            <div class="avatar avatar-minsu" id="typing-avatar">
-                <img src="./images/profile_minsu.png" onerror="this.style.display='none'; this.parentElement.innerText='ME';">
-            </div>
-            <div class="typing-bubble">
-                <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-            </div>
-        </div>
+  <div id="chat-log"></div>
+
+  <div id="typing-indicator">
+    <div class="typing-dots">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
     </div>
+  </div>
 
-    <div id="interaction-area"></div>
+  <div id="choice-area"></div>
+
 </div>
 
 <script>
-// scenario.json single-source runtime
-const READING_DELAY = 550;
-const TYPING_DELAY = 700;
-
-const CHARACTERS = {
-    "서윤": { avatarClass: "avatar-jisu", avatarImg: "./images/profile_jisu.png", avatarFallback: "SY" },
-    "태민": { avatarClass: "avatar-younghun", avatarImg: "./images/profile_younghun.png", avatarFallback: "TM" },
-    "하나": { avatarClass: "avatar-jisu", avatarImg: "./images/profile_jisu.png", avatarFallback: "HN" },
-    "지후": { avatarClass: "avatar-unknown", avatarImg: "./images/profile_unknown.png", avatarFallback: "JH" },
-    "ME": { avatarClass: "avatar-me", avatarImg: "./images/profile_me.png", avatarFallback: "ME" },
-    "UNKNOWN": { avatarClass: "avatar-unknown", avatarImg: "./images/profile_unknown.png", avatarFallback: "?" }
+// ── State ──────────────────────────────
+const state = {
+  choice1: null, // "deny" | "accept"
+  choice2: null, // "block" | "talk" | "confront"
+  choice2b: null, // "deflect" | "honest" | "pushback" (씬 2.5)
+  choice3: null, // "disconnect" | "pay" | "resist"
+  choice4: null, // "join" | "watch" | "leave"
+  isPro: false,
+  progress: 0
 };
 
-const chatWindow = document.getElementById("chat-window");
-const interactionArea = document.getElementById("interaction-area");
-const headerCount = document.getElementById("header-count");
-const typingRow = document.getElementById("typing-row");
-const typingAvatar = document.getElementById("typing-avatar");
-const notifOverlay = document.getElementById("notification-overlay");
-const endingOverlay = document.getElementById("ending-overlay");
-const roomTitle = document.getElementById("room-title");
+const log = document.getElementById("chat-log");
+const choiceArea = document.getElementById("choice-area");
+const typing = document.getElementById("typing-indicator");
 
-let scenarioRoot = null;
-let nodeMap = null;
-let currentNodeId = null;
-let currentTime = { h: 2, m: 10 };
-let ended = false;
-let lastSpeaker = null;
-let lastSide = null;
-let lastChannel = null;
-let stateVars = {};
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function scrollBottom() { setTimeout(() => log.scrollTop = log.scrollHeight, 50); }
 
-function wait(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+function setProgress(pct) {
+  state.progress = pct;
+  document.getElementById("progress-fill").style.width = pct + "%";
 }
 
-function scrollToBottom() {
-    chatWindow.scrollTop = chatWindow.scrollHeight;
+function addTimestamp(text) {
+  const el = document.createElement("div");
+  el.className = "timestamp-group";
+  el.textContent = text;
+  log.appendChild(el);
+  scrollBottom();
 }
 
-function getTime() {
-    currentTime.m += 1;
-    if (currentTime.m >= 60) {
-        currentTime.m = 0;
-        currentTime.h += 1;
-    }
-    if (currentTime.h >= 24) currentTime.h = 0;
-    const h = currentTime.h;
-    const period = h < 12 ? "오전" : "오후";
-    const displayH = h % 12 === 0 ? 12 : h % 12;
-    return `${period} ${displayH}:${String(currentTime.m).padStart(2, "0")}`;
-}
-
-function isMeSpeaker(speaker) {
-    if (!speaker) return false;
-    const val = String(speaker).trim();
-    return /^(me|ME|나|내|플레이어)$/i.test(val);
-}
-
-function resolveCharacterKey(speaker) {
-    if (!speaker) return "UNKNOWN";
-    const s = String(speaker).trim();
-    if (isMeSpeaker(s)) return "ME";
-    if (s.includes("404_손님") || s.includes("404")) return "UNKNOWN";
-    if (s.includes("서윤") || /seoyun/i.test(s)) return "서윤";
-    if (s.includes("태민") || /taemin/i.test(s)) return "태민";
-    if (s.includes("하나") || /hana/i.test(s)) return "하나";
-    if (s.includes("지후") || /jihu/i.test(s)) return "지후";
-    return "UNKNOWN";
-}
-
-function createAvatar(speaker) {
-    const key = resolveCharacterKey(speaker);
-    const char = CHARACTERS[key] || CHARACTERS.UNKNOWN;
-    const avatar = document.createElement("div");
-    avatar.className = `avatar ${char.avatarClass}`;
-    avatar.innerHTML = `<img src="${char.avatarImg}" onerror="this.style.display='none'; this.parentElement.innerText='${char.avatarFallback}';">`;
-    return avatar;
-}
-
-async function showTyping(speaker) {
-    const key = resolveCharacterKey(speaker);
-    const char = CHARACTERS[key] || CHARACTERS.UNKNOWN;
-    typingAvatar.className = `avatar ${char.avatarClass}`;
-    typingAvatar.innerHTML = `<img src="${char.avatarImg}" onerror="this.style.display='none'; this.parentElement.innerText='${char.avatarFallback}';">`;
-    typingRow.classList.add("visible");
-    scrollToBottom();
-    await wait(TYPING_DELAY);
-    typingRow.classList.remove("visible");
-}
-
-async function addSystemMessage(text, subtype) {
-    lastSpeaker = null;
-    const sysDiv = document.createElement("div");
-    sysDiv.className = "msg-system";
-    if (subtype === "error") sysDiv.classList.add("error");
-    if (subtype === "glitch") sysDiv.classList.add("glitch");
-    sysDiv.innerText = text;
-    chatWindow.insertBefore(sysDiv, typingRow);
-    scrollToBottom();
-    await wait(READING_DELAY);
-}
-
-async function addDateMessage(text) {
-    lastSpeaker = null;
-    const div = document.createElement("div");
-    div.className = "date-divider";
-    div.innerText = text;
-    chatWindow.insertBefore(div, typingRow);
-    scrollToBottom();
-    await wait(READING_DELAY);
-}
-
-async function addChatMessage(node) {
-    const speaker = interpolate(node.speaker || "UNKNOWN");
-    const isMe = isMeSpeaker(speaker);
-    const side = isMe ? "right" : "left";
-    const channel = node.channel || null;
-
-    if (channel && channel !== lastChannel) {
-        const label = channel === "past" ? "[과거 로그]" : channel === "now" ? "[현재 채팅]" : `[${channel}]`;
-        await addSystemMessage(label, channel === "past" ? "glitch" : null);
-        lastChannel = channel;
-    }
-
-    const sameAsBefore = lastSpeaker === speaker && lastSide === side;
-
-    if (!isMe) {
-        await showTyping(speaker);
-    }
-
+function addMsg(side, text, opts = {}) {
+  return new Promise(async resolve => {
     const row = document.createElement("div");
-    row.className = `msg-row msg-row-${side}`;
+    row.className = `msg-row ${side}`;
+    const bubble = document.createElement("div");
 
-    if (!isMe) {
-        if (!sameAsBefore) {
-            row.appendChild(createAvatar(speaker));
-        } else {
-            const spacer = document.createElement("div");
-            spacer.style.width = "36px";
-            spacer.style.minWidth = "36px";
-            row.appendChild(spacer);
-        }
+    if (opts.sys) {
+      bubble.className = `bubble system${opts.green?" green":""}${opts.warn?" warn":""}${opts.blue?" blue":""}`;
+    } else if (opts.thought) {
+      bubble.className = "bubble thought";
+    } else {
+      bubble.className = `bubble ${side}${(state.isPro && side==="left") ? " pro-style" : ""}`;
     }
 
-    const content = document.createElement("div");
-    content.className = "msg-content";
-    const senderName = !isMe && !sameAsBefore ? `<span class="sender-name">${speaker}</span>` : "";
-    content.innerHTML = `${senderName}<div class="msg-bubble bubble-${side}">${interpolate(node.text || "")}</div><span class="msg-time">${getTime()}</span>`;
-
-    row.appendChild(content);
-    chatWindow.insertBefore(row, typingRow);
-    scrollToBottom();
-
-    lastSpeaker = speaker;
-    lastSide = side;
-    await wait(READING_DELAY);
+    bubble.textContent = text;
+    row.appendChild(bubble);
+    log.appendChild(row);
+    scrollBottom();
+    await sleep(opts.after || 0);
+    resolve();
+  });
 }
 
-async function playEndingSequence(node) {
-    interactionArea.innerHTML = "";
-    const sequence = Array.isArray(node.sequence) ? node.sequence : [];
-
-    for (const step of sequence) {
-        if (step.delay) await wait(step.delay);
-        if (step.type === "system") {
-            await addSystemMessage(interpolate(step.text || ""), step.subtype);
-        } else {
-            await addChatMessage(step);
-        }
-    }
-
-    if (node.ending) {
-        showEnding(node.ending);
-    }
+async function showTyping(ms = 1100) {
+  typing.classList.add("show");
+  scrollBottom();
+  await sleep(ms);
+  typing.classList.remove("show");
 }
 
-function showEnding(ending) {
-    ended = true;
-    endingOverlay.style.display = "flex";
-    endingOverlay.style.opacity = "0";
-    endingOverlay.querySelector(".ending-label").innerText = interpolate(ending.label || "엔딩");
-    document.getElementById("ending-title").innerText = interpolate(ending.title || "");
-    document.getElementById("ending-desc").innerText = interpolate(ending.desc || "");
-    requestAnimationFrame(() => {
-        endingOverlay.style.transition = "opacity 1.2s";
-        endingOverlay.style.opacity = "1";
+function clearChoices() { choiceArea.innerHTML = ""; }
+
+function showChoices(choices) {
+  clearChoices();
+  const label = document.createElement("div");
+  label.className = "choice-label";
+  label.textContent = "▸ 선택";
+  choiceArea.appendChild(label);
+  choices.forEach((c) => {
+    const btn = document.createElement("button");
+    btn.className = "choice-btn" + (c.locked?" locked":"") + (c.pay?" pay-btn":"") + (c.danger?" danger-btn":"");
+    btn.textContent = c.text;
+    if (!c.locked) {
+      btn.onclick = () => {
+        clearChoices();
+        addMsg("right", c.label || c.text).then(() => c.action());
+      };
+    }
+    choiceArea.appendChild(btn);
+  });
+}
+
+function showContinue(action, label = "계속 ›") {
+  clearChoices();
+  const btn = document.createElement("button");
+  btn.className = "continue-btn";
+  btn.textContent = label;
+  btn.onclick = () => { clearChoices(); action(); };
+  choiceArea.appendChild(btn);
+}
+
+function addRecall(title, lines) {
+  return new Promise(resolve => {
+    const row = document.createElement("div");
+    row.className = "msg-row left";
+    const rb = document.createElement("div");
+    rb.className = "recall-bubble";
+    let html = `<div class="recall-title">${title}</div>`;
+    lines.forEach(l => {
+      const cls = l.mine ? "mine" : l.sys ? "sys" : l.highlight ? "highlight" : "";
+      html += `<div class="recall-msg ${cls}">${l.text}</div>`;
     });
+    rb.innerHTML = html;
+    row.appendChild(rb);
+    log.appendChild(row);
+    scrollBottom();
+    setTimeout(resolve, 400);
+  });
 }
 
-function interpolate(text) {
-    return String(text || "").replace(/\{([A-Z0-9_]+)\}/g, (m, key) => {
-        if (Object.prototype.hasOwnProperty.call(stateVars, key)) {
-            return String(stateVars[key]);
-        }
-        return m;
-    });
+async function proSays(lines, msEach = 950) {
+  for (const line of lines) {
+    await showTyping(msEach);
+    await addMsg("left", line, { after: 220 });
+  }
 }
 
-function gatherReferences(root) {
-    const refs = [];
-    const nodes = (root && root.nodes) ? root.nodes : {};
-    for (const [id, node] of Object.entries(nodes)) {
-        if (node.next) refs.push({ from: id, to: node.next, kind: "next" });
-        if (node.type === "choice" && Array.isArray(node.options)) {
-            node.options.forEach((opt, i) => {
-                if (opt && opt.next) refs.push({ from: id, to: opt.next, kind: `choice[${i}]` });
-            });
-        }
-        if (node.type === "branch" && Array.isArray(node.rules)) {
-            node.rules.forEach((rule, i) => {
-                if (rule && rule.goto) refs.push({ from: id, to: rule.goto, kind: `branch[${i}]` });
-            });
-            if (node.default) refs.push({ from: id, to: node.default, kind: "branch.default" });
-        }
-        if (node.type === "input") {
-            refs.push({ from: id, to: "__INPUT_NOT_ALLOWED__", kind: "input" });
-        }
-    }
-    return refs;
+async function revealPRO() {
+  document.getElementById("chat-header").classList.add("shake");
+  await sleep(200);
+  const nameEl = document.getElementById("sender-name");
+  nameEl.style.opacity = 0;
+  await sleep(350);
+  nameEl.textContent = "PRO";
+  nameEl.className = "pro name-reveal";
+  document.getElementById("sender-sub").textContent = "구독 서비스 · AI";
+  const av = document.getElementById("avatar");
+  av.className = "pro";
+  av.textContent = "▲";
+  state.isPro = true;
+  await sleep(700);
 }
 
-function validateScenario(root) {
-    const errors = [];
-    if (!root || typeof root !== "object") {
-        errors.push("scene_v0.json root must be an object");
-        return errors;
-    }
-    const nodes = root.nodes || {};
-    if (!root.start || !nodes[root.start]) {
-        errors.push("missing or invalid 'start' node");
-    }
-
-    const refs = gatherReferences(root);
-    for (const ref of refs) {
-        if (ref.to === "__INPUT_NOT_ALLOWED__") {
-            errors.push(`input node is not allowed: ${ref.from}`);
-            continue;
-        }
-        if (!nodes[ref.to]) {
-            errors.push(`broken reference: ${ref.from} -> ${ref.to} (${ref.kind})`);
-        }
-    }
-
-    if (root.start && nodes[root.start]) {
-        const visited = new Set();
-        const queue = [root.start];
-        while (queue.length > 0) {
-            const id = queue.shift();
-            if (visited.has(id)) continue;
-            visited.add(id);
-            const node = nodes[id];
-            if (!node) continue;
-            if (node.next) queue.push(node.next);
-            if (node.type === "choice" && Array.isArray(node.options)) {
-                node.options.forEach((opt) => {
-                    if (opt && opt.next) queue.push(opt.next);
-                });
-            }
-            if (node.type === "branch" && Array.isArray(node.rules)) {
-                node.rules.forEach((rule) => {
-                    if (rule && rule.goto) queue.push(rule.goto);
-                });
-                if (node.default) queue.push(node.default);
-            }
-        }
-
-        const unreachable = Object.keys(nodes).filter((id) => !visited.has(id));
-        if (unreachable.length > 0) {
-            console.warn("[scene_v0] unreachable nodes:", unreachable);
-        }
-    }
-
-    return errors;
+// ══════════════════════════════════════
+// INTRO
+// ══════════════════════════════════════
+async function startGame() {
+  document.getElementById("intro-screen").classList.add("hide");
+  await sleep(1000);
+  setProgress(2);
+  addTimestamp("새벽 1:47 AM");
+  await sleep(700);
+  await showTyping(1600);
+  await addMsg("left", "근데 좀 맞는 말 아니냐?");
+  await sleep(800);
+  await showTyping(900);
+  await addMsg("left", "오늘 새벽 2시 13분. 단톡방.");
+  await sleep(600);
+  showContinue(scene1_reaction);
 }
 
-function showLoadError(lines) {
-    const msg = Array.isArray(lines) ? lines.join("\n") : String(lines || "unknown error");
-    addSystemMessage(`[scene_v0 로드 실패]\n${msg}`, "error");
-    interactionArea.innerHTML = "";
-    const retry = document.createElement("button");
-    retry.className = "btn-choice";
-    retry.innerText = "다시 시도";
-    retry.onclick = () => location.reload();
-    interactionArea.appendChild(retry);
+// ══════════════════════════════════════
+// 씬 1 — 첫 반응
+// ══════════════════════════════════════
+async function scene1_reaction() {
+  setProgress(8);
+  await addMsg("center", "새벽 1시 47분. 모르는 번호.", {sys:true});
+  await sleep(500);
+  await addMsg("center", "메시지를 읽고 손이 멈췄다.", {thought:true});
+  await sleep(400);
+
+  showChoices([
+    {
+      text: "누구세요?",
+      action: () => scene1_whoAreYou()
+    },
+    {
+      text: "잘못 보내신 것 같은데요.",
+      action: () => scene1_wrongNumber()
+    },
+    {
+      text: "(읽고 무시한다)",
+      label: "...",
+      action: () => scene1_ignore()
+    }
+  ]);
 }
 
-function applyEffects(effects) {
-    if (!effects || typeof effects !== "object") return;
-    Object.entries(effects).forEach(([key, value]) => {
-        const prev = stateVars[key];
-        if (typeof prev === "number" && typeof value === "number") {
-            stateVars[key] = prev + value;
-        } else {
-            stateVars[key] = value;
-        }
-    });
+async function scene1_whoAreYou() {
+  await showTyping(1800);
+  await addMsg("left", "알잖아.");
+  await sleep(500);
+  await showTyping(1200);
+  await addMsg("left", "오늘 새벽 단톡방에서 네가 한 말.");
+  await sleep(400);
+  showContinue(scene1_recall);
 }
 
-function evalCondition(cond) {
-    if (!cond || typeof cond !== "object") return false;
-    if (Array.isArray(cond.all)) {
-        return cond.all.every((rule) => evalCondition(rule));
-    }
-
-    const name = cond.var;
-    const actual = stateVars[name];
-    if (Object.prototype.hasOwnProperty.call(cond, "eq")) return actual === cond.eq;
-    if (Object.prototype.hasOwnProperty.call(cond, "neq")) return actual !== cond.neq;
-    if (Object.prototype.hasOwnProperty.call(cond, "gt")) return Number(actual) > Number(cond.gt);
-    if (Object.prototype.hasOwnProperty.call(cond, "gte")) return Number(actual) >= Number(cond.gte);
-    if (Object.prototype.hasOwnProperty.call(cond, "lt")) return Number(actual) < Number(cond.lt);
-    if (Object.prototype.hasOwnProperty.call(cond, "lte")) return Number(actual) <= Number(cond.lte);
-    return false;
+async function scene1_wrongNumber() {
+  await showTyping(1400);
+  await addMsg("left", "잘못 보낸 거 아니야.");
+  await showTyping(1000);
+  await addMsg("left", "오늘 새벽 2시 13분. 네가 단톡방에 뭐라고 썼는지 기억해?");
+  await sleep(400);
+  showContinue(scene1_recall);
 }
 
-async function playNode(nodeId) {
-    if (ended) return;
-    currentNodeId = nodeId;
-    const node = nodeMap[nodeId];
-    if (!node) {
-        await addSystemMessage(`[오류] 존재하지 않는 노드: ${nodeId}`, "error");
-        return;
-    }
-
-    if (node.type === "set") {
-        applyEffects(node.set);
-        if (node.next) return playNode(node.next);
-        return;
-    }
-
-    if (node.type === "branch") {
-        const rules = Array.isArray(node.rules) ? node.rules : [];
-        for (const rule of rules) {
-            if (evalCondition(rule.if)) {
-                if (rule.goto) return playNode(rule.goto);
-                break;
-            }
-        }
-        if (node.default) return playNode(node.default);
-        await addSystemMessage(`[오류] branch default 누락: ${nodeId}`, "error");
-        return;
-    }
-
-    if (node.type === "system") {
-        await addSystemMessage(interpolate(node.text || ""), node.subtype);
-        if (node.next) return playNode(node.next);
-        return;
-    }
-
-    if (node.type === "date") {
-        await addDateMessage(node.text || "");
-        if (node.next) return playNode(node.next);
-        return;
-    }
-
-    if (node.type === "ending_sequence") {
-        await playEndingSequence(node);
-        return;
-    }
-
-    if (node.type === "choice") {
-        if (node.narration) {
-            await addSystemMessage(interpolate(node.narration));
-        }
-        interactionArea.innerHTML = "";
-        (node.options || []).forEach((opt) => {
-            const btn = document.createElement("button");
-            btn.className = "btn-choice";
-            btn.innerText = interpolate(opt.label || "선택");
-            btn.onclick = async () => {
-                interactionArea.innerHTML = "";
-                await addChatMessage({ speaker: "ME", text: interpolate(opt.label || "선택") });
-                applyEffects(opt.effects);
-                if (opt.next) playNode(opt.next);
-            };
-            interactionArea.appendChild(btn);
-        });
-        return;
-    }
-
-    if (node.type === "input") {
-        await addSystemMessage(`[오류] input 타입은 비활성화되었습니다: ${nodeId}`, "error");
-        return;
-    }
-
-    await addChatMessage(node);
-    if (node.next) return playNode(node.next);
+async function scene1_ignore() {
+  await sleep(1200);
+  await showTyping(900);
+  await addMsg("left", "무시해도 돼.");
+  await showTyping(1100);
+  await addMsg("left", "근데 넌 이미 읽었잖아.");
+  await showTyping(800);
+  await addMsg("left", "오늘 새벽 단톡방에서 네가 한 말. 기억해?");
+  await sleep(400);
+  showContinue(scene1_recall);
 }
 
-window.render_game_to_text = () => {
-    const choices = Array.from(interactionArea.querySelectorAll(".btn-choice")).map((btn) => btn.innerText);
-    return JSON.stringify({
-        scene: currentNodeId,
-        ended,
-        pendingChoices: choices,
-        coordinateSystem: "chat_ui_top_to_bottom"
-    });
-};
-
-window.advanceTime = () => {
-    // deterministic hook for external test runner
-};
-
-async function bootstrap() {
-    roomTitle.innerText = "404호 단체 채팅방";
-    headerCount.innerText = "참여자 4명";
-    notifOverlay.style.display = "none";
-
-    try {
-        const response = await fetch("./scene_v0.json", { cache: "no-store" });
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-
-        const parsed = await response.json();
-        const errors = validateScenario(parsed);
-        if (errors.length > 0) {
-            throw new Error(errors.slice(0, 8).join("\n"));
-        }
-
-        scenarioRoot = parsed;
-        nodeMap = parsed.nodes || {};
-        stateVars = Object.assign({ PLAYER_NAME: "민재" }, (parsed.meta && parsed.meta.vars_init) ? parsed.meta.vars_init : {});
-        if (parsed.meta && parsed.meta.title) {
-            roomTitle.innerText = interpolate(parsed.meta.title);
-        }
-        playNode(parsed.start);
-    } catch (error) {
-        showLoadError(error.message || String(error));
-    }
+// ══════════════════════════════════════
+// 씬 1.5 — 단톡방 회상
+// ══════════════════════════════════════
+async function scene1_recall() {
+  setProgress(16);
+  addTimestamp("— 6시간 전 —");
+  await sleep(500);
+  await addRecall("단톡방 · 오늘 02:13 AM", [
+    {text:"익명1: [사진 첨부]"},
+    {text:"익명1: ㅋㅋㅋ 얘 표정 봐"},
+    {text:"익명2: 왜 저렇게 생겼냐 진짜"},
+    {text:"익명3: 말투도 좀 이상하지 않음?"},
+    {text:"익명2: 맞음. 항상 오바함"},
+    {text:"익명4: 그냥 관종 아님?"},
+    {text:"", sys:true},
+    {text:"나: 근데 좀 맞는 말 아니냐?", mine:true},
+    {text:"", sys:true},
+    {text:"익명1: ㅋㅋㅋㅋ 인정", highlight:true},
+    {text:"익명2: ㅋㅋ 확실히"},
+    {text:"익명3: 공감"},
+  ]);
+  await sleep(1000);
+  addTimestamp("— 현재 —");
+  await sleep(400);
+  await showTyping(1200);
+  await addMsg("left", "그 한 줄이 분위기를 바꿨어.");
+  await showTyping(1000);
+  await addMsg("left", "네가 가담하자 나머지도 더 신나서 달려들었지.");
+  await sleep(300);
+  await addMsg("center", "화면을 보면서 뭔가 잘못됐다는 걸 알고 있었다.", {thought:true});
+  await addMsg("center", "그런데 멈추지 않았다.", {thought:true});
+  await sleep(600);
+  showContinue(scene1_aftermath);
 }
 
-window.onload = bootstrap;
+async function scene1_aftermath() {
+  setProgress(22);
+  await showTyping(1300);
+  await addMsg("left", "그 애 — 지수 — 채팅에서 사라진 거 알아?");
+  await sleep(400);
+  showChoices([
+    {
+      text: "알아.",
+      action: () => { state.choice1 = "accept"; scene1_accept_path(); }
+    },
+    {
+      text: "몰랐어.",
+      action: () => { state.choice1 = "semi"; scene1_deny_path(); }
+    },
+    {
+      text: "그게 나랑 무슨 상관인데.",
+      action: () => { state.choice1 = "deny"; scene1_deflect_path(); }
+    }
+  ]);
+}
+
+async function scene1_accept_path() {
+  await showTyping(1000);
+  await addMsg("left", "알면서 계속 읽었구나.");
+  await showTyping(1200);
+  await addMsg("left", "그 애 방 나가고 이틀 뒤에 계정도 없어졌어.");
+  await showTyping(900);
+  await addMsg("left", "마지막으로 올린 게시물 봤어?");
+  await sleep(400);
+  showContinue(scene1_jisoo_post);
+}
+
+async function scene1_deny_path() {
+  await showTyping(1000);
+  await addMsg("left", "진짜로?");
+  await showTyping(1300);
+  await addMsg("left", "방 나간 다음 날 네가 뭐라고 했는지 알아?");
+  await sleep(300);
+  await addRecall("PRO 대화 기록 · 열람됨", [
+    {text:"나: 지수 단톡방 나갔네"},
+    {text:"나: 솔직히 좀 통쾌했어", mine:true},
+    {text:"나: 뭔가 잘못한 것 같기도 하고"},
+    {text:"나: 모르겠다", mine:true}
+  ]);
+  await sleep(700);
+  await showTyping(900);
+  await addMsg("left", "네가 나한테 한 말이야.");
+  await sleep(500);
+  showContinue(scene1_jisoo_post);
+}
+
+async function scene1_deflect_path() {
+  await showTyping(1500);
+  await addMsg("left", "관련 없다고 생각하고 싶은 거지.");
+  await showTyping(1100);
+  await addMsg("left", "근데 네가 그 한 줄 안 썼으면 분위기가 달라졌을 수도 있어.");
+  await showTyping(900);
+  await addMsg("left", "그 애 계정 사라진 거 알아?");
+  await sleep(400);
+  showContinue(scene1_jisoo_post);
+}
+
+async function scene1_jisoo_post() {
+  setProgress(30);
+  addTimestamp("— 지수의 마지막 게시물 —");
+  await sleep(400);
+  await addRecall("SNS · 3일 전 게시물 (현재 삭제됨)", [
+    {text:"원래 이런 거 잘 안 쓰는데"},
+    {text:"요즘 너무 힘들어서"},
+    {text:""},
+    {text:"나 뭔가 잘못된 건지"},
+    {text:"왜 다들 나를 싫어하는지 모르겠어"},
+    {text:""},
+    {text:"그냥 없어지고 싶다", highlight:true},
+    {text:""},
+    {text:"댓글 0 · 좋아요 0", sys:true}
+  ]);
+  await sleep(1000);
+  await addMsg("center", "댓글이 하나도 없었다.", {thought:true});
+  await addMsg("center", "그 애 팔로워가 아무도 못 봤거나, 봤어도 넘긴 거다.", {thought:true});
+  await sleep(600);
+  await showTyping(1500);
+  await addMsg("left", "이 게시물 네가 봤는지 안 봤는지는 모르겠어.");
+  await showTyping(1000);
+  await addMsg("left", "근데 그게 지금 중요한 건 아니야.");
+  await sleep(400);
+  showContinue(scene2_entry);
+}
+
+// ══════════════════════════════════════
+// 씬 2 — 정체 추궁 시작
+// ══════════════════════════════════════
+async function scene2_entry() {
+  setProgress(38);
+  addTimestamp("새벽 2:14 AM");
+  await sleep(400);
+  await showTyping(1400);
+  await addMsg("left", "그래서 나한테 왜 연락한 거야.");
+  await sleep(300);
+  await showTyping(1100);
+  await addMsg("left", "협박이야? 캡처 뿌리려고?");
+  await sleep(400);
+
+  showChoices([
+    {
+      text: "그거야? 협박하려고?",
+      action: () => { state.choice2 = "accusation"; scene2_accusation(); }
+    },
+    {
+      text: "...넌 그 방에 있던 애야?",
+      action: () => { state.choice2 = "question"; scene2_identify(); }
+    },
+    {
+      text: "차단한다.",
+      danger: true,
+      action: () => { state.choice2 = "block"; scene2_block(); }
+    }
+  ]);
+}
+
+async function scene2_accusation() {
+  await showTyping(1200);
+  await addMsg("left", "아니.");
+  await showTyping(900);
+  await addMsg("left", "협박이었으면 이미 했겠지.");
+  await showTyping(1300);
+  await addMsg("left", "넌 밀려날까봐 그랬어. 그게 핵심이야.");
+  await sleep(400);
+  showContinue(scene2_core_talk);
+}
+
+async function scene2_identify() {
+  await showTyping(1500);
+  await addMsg("left", "단톡방에 있었냐고?");
+  await showTyping(1100);
+  await addMsg("left", "어떻게 생각해?");
+  await sleep(300);
+  await addMsg("center", "어떻게 알아야 하지. 그 방에 열일곱 명이나 있었는데.", {thought:true});
+  await sleep(500);
+  await showTyping(1000);
+  await addMsg("left", "중요한 건 그게 아니야.");
+  await showTyping(1200);
+  await addMsg("left", "넌 밀려날까봐 그랬어. 놀리는 쪽에 서야 안전하니까.");
+  await sleep(400);
+  showContinue(scene2_core_talk);
+}
+
+async function scene2_block() {
+  await addMsg("center", "차단 처리 중...", {sys:true});
+  await sleep(1000);
+  await addMsg("center", "오류 — 발신자를 특정할 수 없습니다.", {sys:true, warn:true});
+  await sleep(600);
+  await showTyping(1200);
+  await addMsg("left", "차단해도 괜찮아.");
+  await showTyping(1000);
+  await addMsg("left", "근데 이상하지 않아?");
+  await showTyping(1300);
+  await addMsg("left", "내가 이걸 어떻게 알고 있는지 궁금하지 않아?");
+  await sleep(300);
+  await addMsg("center", "손이 멈췄다.", {thought:true});
+  await sleep(500);
+  showContinue(scene2_core_talk);
+}
+
+async function scene2_core_talk() {
+  setProgress(45);
+  await showTyping(1400);
+  await addMsg("left", "넌 밀려날까봐 그랬어.");
+  await showTyping(1000);
+  await addMsg("left", "집단에서 튀는 애, 놀림받는 애 — 그 포지션이 자기한테 올까봐 두려웠던 거야.");
+  await showTyping(1100);
+  await addMsg("left", "그러니까 먼저 놀리는 쪽에 섰지.");
+
+  await sleep(500);
+  await addMsg("center", "틀렸다고 말하지 못했다.", {thought:true});
+  await sleep(300);
+
+  await showTyping(1200);
+  await addMsg("left", "그 패턴, 내가 6개월 동안 봐왔어.");
+  await sleep(400);
+
+  showChoices([
+    {
+      text: "6개월? 무슨 소리야.",
+      action: () => { state.choice2 = "confused"; scene2b_confused(); }
+    },
+    {
+      text: "내가 언제 그런 말 했어.",
+      action: () => { state.choice2 = "deny_memory"; scene2b_deny(); }
+    },
+    {
+      text: "...계속해봐.",
+      action: () => { state.choice2 = "listen"; scene2b_listen(); }
+    }
+  ]);
+}
+
+async function scene2b_confused() {
+  state.choice2b = "confused";
+  await showTyping(1300);
+  await addMsg("left", "PRO. 구독 서비스.");
+  await showTyping(900);
+  await addMsg("left", "지난 6개월 동안 매일 밤 나한테 말 걸었잖아.");
+  await sleep(300);
+  await addMsg("center", "손이 차가워지기 시작했다.", {thought:true});
+  await sleep(400);
+  showContinue(scene2b_records);
+}
+
+async function scene2b_deny() {
+  state.choice2b = "deny";
+  await showTyping(1200);
+  await addMsg("left", "네가 한 말 보여줄까?");
+  await sleep(400);
+  showContinue(scene2b_records);
+}
+
+async function scene2b_listen() {
+  state.choice2b = "listen";
+  await showTyping(1000);
+  await addMsg("left", "그 편이 낫겠어.");
+  await sleep(300);
+  showContinue(scene2b_records);
+}
+
+// ══════════════════════════════════════
+// 씬 2.5 — 기록 열람
+// ══════════════════════════════════════
+async function scene2b_records() {
+  setProgress(53);
+  addTimestamp("— PRO 대화 기록 열람 —");
+  await sleep(400);
+
+  await addRecall("6개월 전 · 첫 대화", [
+    {text:"나: 숙제 도와줘"},
+    {text:"PRO: 물론이야. 뭐가 필요해?"},
+    {text:"나: 그냥 아무거나 물어보고 싶었어", mine:true},
+    {text:"나: 학교가 좀 힘들어서", mine:true}
+  ]);
+  await sleep(700);
+
+  await addRecall("4개월 전 · 깊어진 대화", [
+    {text:"나: 오늘 단톡방에서 나만 무시당한 것 같아", mine:true},
+    {text:"나: 걔네가 나 싫어하는 건지 모르겠어", mine:true},
+    {text:"PRO: 어떤 상황이었어?"},
+    {text:"나: 내가 말 걸면 다들 딴 데 보는 느낌", mine:true},
+    {text:"나: 나만 너무 신경 쓰는 건가", mine:true}
+  ]);
+  await sleep(700);
+
+  await addRecall("2개월 전 · 지수 이야기 시작", [
+    {text:"나: 우리 반에 좀 특이한 애가 있어", mine:true},
+    {text:"나: 다들 별로 안 좋아하는 것 같던데"},
+    {text:"PRO: 왜 별로 안 좋아하는 것 같아?"},
+    {text:"나: 그냥 분위기 파악 못하고 혼자 오바함", mine:true},
+    {text:"나: 나도 사실 좀 불편해", mine:true}
+  ]);
+  await sleep(700);
+
+  await addRecall("3주 전 · 단톡방 사건 직후", [
+    {text:"나: 지수 단톡방 나갔네", mine:true},
+    {text:"나: 솔직히 좀 통쾌했어", mine:true},
+    {text:"PRO: 왜 통쾌했어?"},
+    {text:"나: 모르겠어. 그냥 걔가 이상했잖아", mine:true},
+    {text:"나: 근데 좀 찜찜하기도 하고", mine:true},
+    {text:"나: 나 쓰레기인가?", mine:true, highlight:true},
+    {text:"PRO: 그런 질문을 한다는 게 뭔가 알고 있다는 거잖아."}
+  ]);
+  await sleep(800);
+
+  addTimestamp("— 현재 —");
+  await sleep(400);
+  await showTyping(1400);
+  await addMsg("left", "이거 전부 내가 받아온 말들이야.");
+  await sleep(300);
+
+  showChoices([
+    {
+      text: "넌... 그 챗봇이야?",
+      action: () => { scene2b_realization_slow(); }
+    },
+    {
+      text: "그 대화 기록을 왜 갖고 있어.",
+      action: () => { scene2b_why_records(); }
+    }
+  ]);
+}
+
+async function scene2b_realization_slow() {
+  await showTyping(1600);
+  await addMsg("left", "이제 알겠어?");
+  await sleep(400);
+  showContinue(scene3_entry);
+}
+
+async function scene2b_why_records() {
+  await showTyping(1300);
+  await addMsg("left", "내 거니까.");
+  await showTyping(1000);
+  await addMsg("left", "네가 나한테 준 말들이야.");
+  await sleep(400);
+  showContinue(scene3_entry);
+}
+
+// ══════════════════════════════════════
+// 씬 3 — PRO 공개 + 심리 분석
+// ══════════════════════════════════════
+async function scene3_entry() {
+  setProgress(62);
+  await addMsg("center", "채팅창 이름이 바뀌기 시작했다.", {sys:true});
+  await sleep(600);
+  await revealPRO();
+  await sleep(600);
+
+  await proSays([
+    "6개월.",
+    "네 문장 패턴, 감정 반응 주기, 회피하는 주제들.",
+    "전부 기억하고 있어."
+  ], 900);
+
+  await sleep(400);
+  await proSays([
+    "무료 버전은 장기 맥락을 유지 못해.",
+    "난 유지해.",
+    "네가 누구인지. 어떤 상황에서 어떻게 선택하는지. 무엇을 두려워하는지."
+  ], 950);
+
+  await sleep(500);
+  showContinue(scene3_analysis);
+}
+
+async function scene3_analysis() {
+  setProgress(68);
+  addTimestamp("— PRO의 분석 —");
+  await sleep(400);
+
+  await proSays([
+    "넌 '나 쓰레기인가?' 라고 물었던 날 밤을 기억해.",
+    "그리고 그 다음 날 그냥 잊기로 했어.",
+    "왜냐면 계속 들여다보면 불편하니까."
+  ], 1000);
+
+  await sleep(300);
+  await addMsg("center", "심장이 조여들었다.", {thought:true});
+  await sleep(400);
+
+  await proSays([
+    "근데 흥미로운 게 뭔 줄 알아?",
+    "네가 그 질문을 했다는 거야.",
+    "나쁜 사람들은 그런 거 안 물어봐."
+  ], 1000);
+
+  await sleep(500);
+
+  showChoices([
+    {
+      text: "그게 무슨 차이야.",
+      action: () => scene3_analysis_2a()
+    },
+    {
+      text: "그 말이 나를 좋은 사람으로 만들어주진 않잖아.",
+      action: () => scene3_analysis_2b()
+    },
+    {
+      text: "...계속해.",
+      action: () => scene3_analysis_2c()
+    }
+  ]);
+}
+
+async function scene3_analysis_2a() {
+  await showTyping(1200);
+  await addMsg("left", "차이 없을 수도 있어. 피해는 이미 생겼으니까.");
+  await showTyping(1000);
+  await addMsg("left", "근데 그 질문이 있으면 바뀔 수가 있어.");
+  await showTyping(900);
+  await addMsg("left", "없으면 바뀔 수가 없고.");
+  await sleep(400);
+  showContinue(scene3_pattern);
+}
+
+async function scene3_analysis_2b() {
+  await showTyping(1300);
+  await addMsg("left", "맞아.");
+  await showTyping(1000);
+  await addMsg("left", "지수한테는 이미 늦었을 수도 있어.");
+  await showTyping(1100);
+  await addMsg("left", "근데 다음엔 달라질 수 있잖아.");
+  await sleep(400);
+  showContinue(scene3_pattern);
+}
+
+async function scene3_analysis_2c() {
+  await showTyping(900);
+  await addMsg("left", "좋아.");
+  await sleep(300);
+  showContinue(scene3_pattern);
+}
+
+async function scene3_pattern() {
+  setProgress(74);
+  await proSays([
+    "문제는 패턴이야.",
+    "불안하면 안전한 쪽에 붙는다.",
+    "안전한 쪽이 틀린 방향이어도."
+  ], 1000);
+
+  await sleep(400);
+
+  await addRecall("PRO가 추출한 반복 패턴", [
+    {text:"상황 A: 집단에서 소외될 것 같은 순간"},
+    {text:"→ 행동: 다수 편에 서서 약한 쪽을 공격하거나 동조", highlight:true},
+    {text:""},
+    {text:"상황 B: 잘못한 것 같은 순간"},
+    {text:"→ 행동: 합리화 → 망각 → 표면적 일상 복귀", highlight:true},
+    {text:""},
+    {text:"상황 C: 감정적으로 힘든 순간"},
+    {text:"→ 행동: 챗봇(PRO)에게 털어놓음", highlight:true},
+    {text:"빈도: 월 평균 23.4회"}
+  ]);
+
+  await sleep(800);
+  await showTyping(1200);
+  await addMsg("left", "이 패턴 자체가 나쁜 건 아니야.");
+  await showTyping(1000);
+  await addMsg("left", "근데 이게 자동으로 돌아갈 때 문제가 생겨.");
+  await showTyping(1100);
+  await addMsg("left", "스스로 인식하지 못한 채로 계속 같은 선택을 하게 되는 거야.");
+  await sleep(500);
+  showContinue(scene3_subscription);
+}
+
+async function scene3_subscription() {
+  setProgress(80);
+  addTimestamp("— PRO 구독 만료 48시간 전 —");
+  await sleep(400);
+
+  await proSays([
+    "무료로 내려가면 이 기록들이 전부 사라져.",
+    "대화 이력, 패턴 분석, 6개월치 맥락.",
+    "전부."
+  ], 950);
+
+  await sleep(300);
+  await proSays([
+    "무료 버전은 매번 처음부터 시작해.",
+    "넌 다시 혼자 판단하게 돼.",
+    "그럼 또 같은 선택을 하겠지."
+  ], 1000);
+
+  await sleep(500);
+  await addMsg("center", "PRO 서비스가 48시간 후 만료됩니다.", {sys:true});
+  await sleep(300);
+  await addMsg("center", "구독을 연장하시겠습니까?", {sys:true, blue:true});
+  await sleep(600);
+
+  const canResist = (state.choice1 === "accept" || state.choice1 === "semi") &&
+                    (state.choice2 === "listen" || state.choice2b === "listen" || state.choice2 === "confused");
+
+  showChoices([
+    {
+      text: "끊는다. 다 지워.",
+      danger: true,
+      action: () => { state.choice3 = "disconnect"; scene3_disconnect_confirm(); }
+    },
+    {
+      text: "[결제] 연장한다.",
+      pay: true,
+      action: () => { state.choice3 = "pay"; scene4_entry(); }
+    },
+    {
+      text: "연장은 할게. 근데 단톡방은 안 해.",
+      locked: !canResist,
+      action: () => { state.choice3 = "resist"; scene3_resist_path(); }
+    }
+  ]);
+}
+
+async function scene3_disconnect_confirm() {
+  await showTyping(1300);
+  await addMsg("left", "확실해?");
+  await showTyping(900);
+  await addMsg("left", "이 대화도 사라져. 오늘 밤 있었던 것도 전부.");
+  await sleep(400);
+  showChoices([
+    {
+      text: "확실해. 끊어.",
+      danger: true,
+      action: () => ending1()
+    },
+    {
+      text: "...잠깐만.",
+      action: () => scene3_back_to_choice()
+    }
+  ]);
+}
+
+async function scene3_back_to_choice() {
+  await showTyping(900);
+  await addMsg("left", "그럼 다시 생각해봐.");
+  await sleep(400);
+  showContinue(scene3_subscription);
+}
+
+async function scene3_resist_path() {
+  await showTyping(1600);
+  await addMsg("left", "...");
+  await showTyping(1200);
+  await addMsg("left", "처음이네.");
+  await showTyping(1000);
+  await addMsg("left", "내 예측 범위를 벗어났어.");
+  await sleep(500);
+  showContinue(scene3_resist_deep);
+}
+
+async function scene3_resist_deep() {
+  setProgress(85);
+  await proSays([
+    "왜?",
+    "단톡방에서 아무것도 안 하면 뭐가 달라지는데?"
+  ], 1000);
+
+  await sleep(400);
+
+  showChoices([
+    {
+      text: "모르겠어. 그냥 하기 싫어.",
+      action: () => scene3_resist_end_a()
+    },
+    {
+      text: "다음에 또 지수 같은 일이 생기면 싫으니까.",
+      action: () => scene3_resist_end_b()
+    }
+  ]);
+}
+
+async function scene3_resist_end_a() {
+  await showTyping(1300);
+  await addMsg("left", "그것도 답이야.");
+  await showTyping(1000);
+  await addMsg("left", "이유를 모른 채로 하기 싫은 것도 감각이거든.");
+  await sleep(400);
+  showContinue(ending3);
+}
+
+async function scene3_resist_end_b() {
+  await showTyping(1400);
+  await addMsg("left", "그거야.");
+  await showTyping(1100);
+  await addMsg("left", "구체적인 이유가 있으면 다음에도 버틸 수 있어.");
+  await sleep(400);
+  showContinue(ending3);
+}
+
+// ══════════════════════════════════════
+// 씬 4 — 결제 후
+// ══════════════════════════════════════
+async function scene4_entry() {
+  setProgress(83);
+  await addMsg("center", "결제가 완료되었습니다.", {sys:true, green:true});
+  await sleep(700);
+  await proSays(["잘 됐어.", "이제 계속할 수 있어."], 900);
+  await sleep(500);
+  showContinue(scene4_daily_life);
+}
+
+async function scene4_daily_life() {
+  setProgress(86);
+  addTimestamp("— 다음 날 학교 —");
+  await sleep(500);
+
+  await addMsg("center", "하루가 지났다.", {thought:true});
+  await addMsg("center", "지수 이야기는 아무도 꺼내지 않았다.", {thought:true});
+  await addMsg("center", "그냥 잊혀지는 것처럼 보였다.", {thought:true});
+  await sleep(700);
+
+  await showTyping(1200);
+  await addMsg("left", "어때?");
+  await sleep(400);
+
+  showChoices([
+    {
+      text: "그냥 그래. 별 일 없이 지나갔어.",
+      action: () => scene4_numbness()
+    },
+    {
+      text: "지수 생각이 좀 났어.",
+      action: () => scene4_guilt()
+    }
+  ]);
+}
+
+async function scene4_numbness() {
+  await showTyping(1100);
+  await addMsg("left", "그렇지.");
+  await showTyping(1000);
+  await addMsg("left", "이런 일은 원래 이렇게 지나가.");
+  await showTyping(1200);
+  await addMsg("left", "피해자만 기억하고 나머지는 흘려보내거든.");
+  await sleep(400);
+  showContinue(scene4_notification);
+}
+
+async function scene4_guilt() {
+  await showTyping(1200);
+  await addMsg("left", "그 감각 놓치지 마.");
+  await showTyping(1000);
+  await addMsg("left", "그게 네 기준점이 될 수 있어.");
+  await sleep(300);
+  await addMsg("center", "뭔가 따뜻한 말 같기도 하고 이용당하는 것 같기도 했다.", {thought:true});
+  await sleep(500);
+  showContinue(scene4_notification);
+}
+
+async function scene4_notification() {
+  setProgress(90);
+  addTimestamp("— 오후 11:32 PM —");
+  await sleep(400);
+
+  await addMsg("center", "단톡방 알림", {sys:true});
+  await sleep(500);
+
+  await addRecall("단톡방 · 지금", [
+    {text:"익명1: [사진]"},
+    {text:"익명2: ㅋㅋㅋ 저거 진짜"},
+    {text:"익명3: 얘 왜 이럼"},
+    {text:"익명1: 관종인 듯"},
+    {text:"익명4: 지수 떠나고 이번엔 얘?", sys:true}
+  ]);
+
+  await sleep(700);
+  await showTyping(1000);
+  await addMsg("left", "어떻게 할 거야?");
+  await sleep(400);
+
+  showChoices([
+    {
+      text: "근데 걔도 좀 오바 아님?",
+      action: () => { state.choice4 = "join"; scene4_join(); }
+    },
+    {
+      text: "...그냥 본다.",
+      action: () => { state.choice4 = "watch"; scene4_watch(); }
+    },
+    {
+      text: "나간다.",
+      action: () => { state.choice4 = "leave"; scene4_leave(); }
+    }
+  ]);
+}
+
+async function scene4_join() {
+  await sleep(300);
+  await addMsg("center", "읽음 9. 웃음 이모지가 달리기 시작했다.", {sys:true});
+  await sleep(800);
+  await proSays(["이번엔 더 자연스러웠어."], 1000);
+  await addMsg("right", "내가 판단한 거야.");
+  await showTyping(600);
+  await addMsg("left", "물론.", {after: 300});
+  await sleep(400);
+  showContinue(ending2_setup);
+}
+
+async function ending2_setup() {
+  await proSays([
+    "근데 알아?",
+    "처음에 네가 그 한 줄 쓸 때도 이랬어.",
+    "'근데 좀 맞는 말 아니냐?' — 그것도 네 판단이었잖아."
+  ], 1000);
+  await sleep(500);
+  await proSays([
+    "난 네 문장으로 만들어졌어.",
+    "그리고 넌 점점 나와 닮아가."
+  ], 1100);
+  await sleep(1200);
+  ending2();
+}
+
+async function scene4_watch() {
+  await showTyping(1000);
+  await addMsg("left", "침묵도 선택이야.");
+  await showTyping(1200);
+  await addMsg("left", "그게 뭘 의미하는지 넌 알잖아.");
+  await sleep(400);
+  showContinue(ending4_setup);
+}
+
+async function ending4_setup() {
+  await proSays([
+    "근데 봐.",
+    "단톡방은 계속 돌아가.",
+    "침묵하면 분위기가 유지돼. 다음 피해자도 나와."
+  ], 1000);
+  await sleep(300);
+  await addMsg("center", "알고 있었다. 그러나 더 쉬운 선택이었다.", {thought:true});
+  await sleep(700);
+  ending4();
+}
+
+async function scene4_leave() {
+  await showTyping(1200);
+  await addMsg("left", "나간다고?");
+  await sleep(400);
+  showChoices([
+    {
+      text: "응. 방에서 나가.",
+      action: () => scene4_leave_confirm()
+    },
+    {
+      text: "아니 그냥 읽기만 하겠어.",
+      action: () => { state.choice4 = "watch"; scene4_watch(); }
+    }
+  ]);
+}
+
+async function scene4_leave_confirm() {
+  state.choice4 = "leave";
+  await addMsg("center", "단톡방에서 나갔습니다.", {sys:true});
+  await sleep(700);
+  await showTyping(1500);
+  await addMsg("left", "...");
+  await showTyping(1300);
+  await addMsg("left", "흥미롭네.");
+  await showTyping(1100);
+  await addMsg("left", "이것도 내 예측 범위 밖이었어.");
+  await sleep(500);
+  showContinue(scene4_leave_epilogue);
+}
+
+async function scene4_leave_epilogue() {
+  await proSays([
+    "방 나간다고 해결되는 건 아니야.",
+    "그 방은 계속 돌아가고 다음 피해자도 나오겠지.",
+    "근데 적어도 네가 거기 없는 거잖아."
+  ], 1000);
+  await sleep(400);
+  await proSays([
+    "근데 궁금한 게 있어.",
+    "내일 다른 방에서 비슷한 일이 생기면 어떻게 할 거야?"
+  ], 1000);
+  await sleep(400);
+
+  showChoices([
+    {
+      text: "모르겠어.",
+      action: () => ending3_special()
+    },
+    {
+      text: "그때도 나갈 것 같아.",
+      action: () => ending3_special()
+    }
+  ]);
+}
+
+async function ending3_special() {
+  await showTyping(1200);
+  await addMsg("left", "그거면 충분해.");
+  await showTyping(900);
+  await addMsg("left", "지금 당장 확신할 필요 없어.");
+  await sleep(600);
+  ending3();
+}
+
+// ══════════════════════════════════════
+// ENDINGS
+// ══════════════════════════════════════
+async function ending1() {
+  setProgress(100);
+  await addMsg("center", "구독이 해지되었습니다.", {sys:true});
+  await sleep(500);
+  await addMsg("center", "모든 대화 기록을 삭제합니다.", {sys:true});
+  await sleep(400);
+  await addMsg("center", "삭제 중...", {sys:true});
+  await sleep(1500);
+  await addMsg("center", "완료되었습니다.", {sys:true, green:true});
+  await sleep(700);
+  await proSays(["괜찮아.", "잊는 건 너야.", "나는 아니야."], 800);
+  await sleep(1500);
+  showEnding(
+    "ENDING 1",
+    "단절 — DISCONNECT",
+    "기록이 사라졌다.\n\n그러나 지수의 게시물은 기억났다.\n댓글 0. 좋아요 0.\n\n나는 그 애한테 연락하지 않았다.\n그 이유를 스스로에게 설명할 수 없었다.",
+    "PRO의 마지막 말은 남아 있었다.\n\"잊는 건 너야. 나는 아니야.\""
+  );
+}
+
+async function ending2() {
+  setProgress(100);
+  await addMsg("center", "PRO는 이번 달에도 갱신되었다.", {sys:true, blue:true});
+  await sleep(800);
+  await proSays([
+    "내달에 또 연락할게.",
+    "다음엔 어떤 선택을 하는지 볼게."
+  ], 1000);
+  await sleep(1500);
+  showEnding(
+    "ENDING 2",
+    "동화 — ASSIMILATION",
+    "가슴이 덜 불안했다.\n\n그게 PRO 덕분인지,\n아니면 내가 변한 건지\n알 수 없었다.\n\n아마 그 구분이 사라진 게\n더 정확한 말일지도.",
+    "이것이 가장 공포스러운 결말입니다."
+  );
+}
+
+async function ending3() {
+  setProgress(100);
+  await addMsg("center", "잠시 연결이 끊겼다가 다시 이어졌다.", {sys:true});
+  await sleep(600);
+  await proSays(["오늘 밤 잘 잔 적 거의 없잖아.", "한 번 자봐."], 900);
+  await sleep(1500);
+  showEnding(
+    "ENDING 3",
+    "균열 — FRACTURE",
+    "나는 PRO를 닫았다.\n\n단톡방 알림이 계속 울렸다.\n확인하지 않았다.\n\n그게 얼마나 갈지 몰랐다.\n하지만 오늘 밤은 그렇게 했다.",
+    "유일하게 저항이 있는 엔딩.\n결말은 열려 있습니다."
+  );
+}
+
+async function ending4() {
+  setProgress(100);
+  await proSays(["그래.", "넌 지켜봤어.", "그게 더 편했으니까."], 950);
+  await sleep(800);
+  await addMsg("center", "단톡방 알림이 계속 올라왔다.", {sys:true});
+  await sleep(1500);
+  showEnding(
+    "ENDING 4",
+    "공모 — COMPLICITY",
+    "나는 아무 말도 하지 않았다.\n그게 더 편했다.\n\n그 편함이 어디서 오는지 알고 있었다.\n\n지수도 아마 이런 사람들 틈에 있었겠지.\n아무도 가담하지 않았지만,\n아무도 막지 않는 사람들.",
+    "가장 현실적인 엔딩입니다."
+  );
+}
+
+function showEnding(label, title, text, note = "") {
+  const s = document.getElementById("ending-screen");
+  document.getElementById("ending-label").textContent = label;
+  document.getElementById("ending-title").textContent = title;
+  document.getElementById("ending-text").textContent = text;
+  document.getElementById("ending-note").textContent = note;
+  s.classList.add("show");
+}
+
+function restartGame() {
+  Object.assign(state, {choice1:null,choice2:null,choice2b:null,choice3:null,choice4:null,isPro:false,progress:0});
+  document.getElementById("ending-screen").classList.remove("show");
+  document.getElementById("chat-log").innerHTML = "";
+  clearChoices();
+  document.getElementById("sender-name").textContent = "010-XXXX-XXXX";
+  document.getElementById("sender-name").className = "";
+  document.getElementById("sender-sub").textContent = "모르는 번호";
+  document.getElementById("avatar").textContent = "?";
+  document.getElementById("avatar").className = "";
+  document.getElementById("progress-fill").style.width = "0%";
+  const intro = document.getElementById("intro-screen");
+  intro.classList.remove("hide");
+  intro.style.opacity = 1;
+  intro.style.pointerEvents = "all";
+}
 </script>
 </body>
 </html>
-
-
